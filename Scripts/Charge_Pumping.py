@@ -254,6 +254,8 @@ def Charge_Pumping_compare(chips, curve_legend, col, L, Nfin, VT_flavor, Nrow, d
 
     axe_handle = []
     axe_norm_handle = []
+    axe_raw_handle = []#add the raw current curves under 5MHz and 1kHz
+                 
     for (curve_idx, data_file) in zip(range(len(data_files)), data_files):
         """
         Isub_without_pumping = []
@@ -294,13 +296,23 @@ def Charge_Pumping_compare(chips, curve_legend, col, L, Nfin, VT_flavor, Nrow, d
                     axe, = plt.plot(np.arange(Vbot_Vsbd_min, Vbot_Vsbd_max+0.0001, Vbot_Vsbd_step), Icp_DCcorrected[freq_idx], marker='.')
                     plt.figure(2)
                     axe_norm, = plt.plot(np.arange(Vbot_Vsbd_min, Vbot_Vsbd_max+0.0001, Vbot_Vsbd_step), Icp_DCcorrected[freq_idx]/np.amax(Icp_DCcorrected[freq_idx]), marker='.')
+                    #add the raw current curves under 5MHz and 1kHz
+                    plt.figure(3)
+                    plt.plot(np.arange(Vbot_Vsbd_min, Vbot_Vsbd_max+0.0001, Vbot_Vsbd_step), Isub_pumping[freq_idx], marker='.', linestyle='dotted')
+                    axe_raw, = plt.plot(np.arange(Vbot_Vsbd_min, Vbot_Vsbd_max+0.0001, Vbot_Vsbd_step), Isub_pumping[DCcorrection_freq_idx[curve_idx]], marker='.')
                 if VSBD_descend == 0:
                     plt.figure(1)
                     axe, = plt.plot(np.arange(Vbot_Vsbd_max, Vbot_Vsbd_min-0.0001, (-1)*Vbot_Vsbd_step), Icp_DCcorrected[freq_idx], marker='.')
                     plt.figure(2)
                     axe_norm, = plt.plot(np.arange(Vbot_Vsbd_max, Vbot_Vsbd_min-0.0001, (-1)*Vbot_Vsbd_step), Icp_DCcorrected[freq_idx]/np.amax(Icp_DCcorrected[freq_idx]), marker='.')
+                    #add the raw current curves under 5MHz and 1kHz
+                    plt.figure(3)
+                    plt.plot(np.arange(Vbot_Vsbd_max, Vbot_Vsbd_min-0.0001, (-1)*Vbot_Vsbd_step), Isub_pumping[freq_idx], marker='.', linestyle='dotted')
+                    #add the raw current curves under 5MHz and 1kHz
+                    axe_raw, = plt.plot(np.arange(Vbot_Vsbd_max, Vbot_Vsbd_min-0.0001, (-1)*Vbot_Vsbd_step), Isub_pumping[DCcorrection_freq_idx[curve_idx]], marker='.')
                 axe_handle.append(axe)
                 axe_norm_handle.append(axe_norm)
+                axe_raw_handle.append(axe_raw) #add the raw current curves under 5MHz and 1kHz
 
     plt.figure(1)
     plt.title(title+'L='+str(L)+', Nfin='+str(Nfin)+', '+VT_flavor+', '+'VSS_WL(Vbot)='+str(VSS_WL)+', VDD_WL='+str(VDD_WL)+', sweep VS=VB=VD(Vsbd), charge pumping curves DC corrected by '+freq_DCcorrection, fontsize=7)
@@ -310,7 +322,7 @@ def Charge_Pumping_compare(chips, curve_legend, col, L, Nfin, VT_flavor, Nrow, d
     plt.ylabel('Icp = Isub_with_pumping-Isub_with_pumping @' + freq_DCcorrection +' (nA)')
     plt.grid()
     plt.legend(axe_handle, curve_legend, fontsize = 8)
-    plt.savefig(path_plot+plot_file+'_Col'+str(col).zfill(2)+'Pumping_minus_DCcorrection.pdf')
+    plt.savefig(path_plot+plot_file+'_Col'+str(col).zfill(2)+'_Pumping_minus_DCcorrection.pdf')
     plt.close()
 
     plt.figure(2)
@@ -321,8 +333,22 @@ def Charge_Pumping_compare(chips, curve_legend, col, L, Nfin, VT_flavor, Nrow, d
     plt.ylabel('Icp/Icp,max')
     plt.grid()
     plt.legend(axe_norm_handle, curve_legend, fontsize = 8)
-    plt.savefig(path_plot+plot_file+'_Col'+str(col).zfill(2)+'Pumping_minus_DCcorrection_normalized.pdf')
+    plt.savefig(path_plot+plot_file+'_Col'+str(col).zfill(2)+'_Pumping_minus_DCcorrection_normalized.pdf')
     plt.close()
+
+#Temporary! Check absolute Icp values at 5MHz and 1kHz, to see wether they change conspicuously after various experiments!
+#add the raw current curves under 5MHz and 1kHz
+    plt.figure(3)
+    plt.title(title+'L='+str(L)+', Nfin='+str(Nfin)+', '+VT_flavor+', '+'VSS_WL(Vbot)='+str(VSS_WL)+', VDD_WL='+str(VDD_WL)+', sweep VS=VB=VD(Vsbd), charge pumping currents and DC correction currents at '+freq_DCcorrection, fontsize=7)
+    #plt.axis([VG_min, VG_max, 0, Ymax])
+    plt.xlim(Vbot_Vsbd_min, Vbot_Vsbd_max)
+    plt.xlabel('Vbot - Vsbd (V)')
+    plt.ylabel('Icp at 5MHz (dotted) and @' + freq_DCcorrection +'(line) (nA)')
+    plt.grid()
+    plt.legend(axe_raw_handle, curve_legend, fontsize = 8)
+    plt.savefig(path_plot+plot_file+'_Col'+str(col).zfill(2)+'_5MHz_1kHz_Icp_curves.pdf')
+    plt.close()
+#Temporary! Check absolute Icp values at 5MHz and 1kHz, to see wether they change conspicuously after various experiments!
 
 if __name__ == '__main__':
   main()
