@@ -256,6 +256,8 @@ def Charge_Pumping_compare(chips, curve_legend, col, L, Nfin, VT_flavor, Nrow, d
     axe_norm_handle = []
     axe_raw_handle = []#add the raw current curves under 5MHz and 1kHz
                  
+    color_list = ['blue', 'red', 'yellow', 'lime', 'orange', 'darkviolet', 'crimson', 'lightseagreen', 'olive', 'orchid', 'cyan', 'black']
+
     for (curve_idx, data_file) in zip(range(len(data_files)), data_files):
         """
         Isub_without_pumping = []
@@ -293,23 +295,23 @@ def Charge_Pumping_compare(chips, curve_legend, col, L, Nfin, VT_flavor, Nrow, d
             if freq_idx in plot_freq_idx_DCcorrected[curve_idx]:
                 if VSBD_descend == 1:
                     plt.figure(1)
-                    axe, = plt.plot(np.arange(Vbot_Vsbd_min, Vbot_Vsbd_max+0.0001, Vbot_Vsbd_step), Icp_DCcorrected[freq_idx], marker='.')
+                    axe, = plt.plot(np.arange(Vbot_Vsbd_min, Vbot_Vsbd_max+0.0001, Vbot_Vsbd_step), Icp_DCcorrected[freq_idx], marker='.', color=color_list[curve_idx])
                     plt.figure(2)
-                    axe_norm, = plt.plot(np.arange(Vbot_Vsbd_min, Vbot_Vsbd_max+0.0001, Vbot_Vsbd_step), Icp_DCcorrected[freq_idx]/np.amax(Icp_DCcorrected[freq_idx]), marker='.')
+                    axe_norm, = plt.plot(np.arange(Vbot_Vsbd_min, Vbot_Vsbd_max+0.0001, Vbot_Vsbd_step), Icp_DCcorrected[freq_idx]/np.amax(Icp_DCcorrected[freq_idx]), marker='.', color=color_list[curve_idx])
                     #add the raw current curves under 5MHz and 1kHz
                     plt.figure(3)
-                    plt.plot(np.arange(Vbot_Vsbd_min, Vbot_Vsbd_max+0.0001, Vbot_Vsbd_step), Isub_pumping[freq_idx], marker='.', linestyle='dotted')
-                    axe_raw, = plt.plot(np.arange(Vbot_Vsbd_min, Vbot_Vsbd_max+0.0001, Vbot_Vsbd_step), Isub_pumping[DCcorrection_freq_idx[curve_idx]], marker='.')
+                    plt.plot(np.arange(Vbot_Vsbd_min, Vbot_Vsbd_max+0.0001, Vbot_Vsbd_step), Isub_pumping[freq_idx], marker='.', linestyle='dotted', color=color_list[curve_idx])
+                    axe_raw, = plt.plot(np.arange(Vbot_Vsbd_min, Vbot_Vsbd_max+0.0001, Vbot_Vsbd_step), Isub_pumping[DCcorrection_freq_idx[curve_idx]], marker='.', color=color_list[curve_idx])
                 if VSBD_descend == 0:
                     plt.figure(1)
-                    axe, = plt.plot(np.arange(Vbot_Vsbd_max, Vbot_Vsbd_min-0.0001, (-1)*Vbot_Vsbd_step), Icp_DCcorrected[freq_idx], marker='.')
+                    axe, = plt.plot(np.arange(Vbot_Vsbd_max, Vbot_Vsbd_min-0.0001, (-1)*Vbot_Vsbd_step), Icp_DCcorrected[freq_idx], marker='.', color=color_list[curve_idx])
                     plt.figure(2)
-                    axe_norm, = plt.plot(np.arange(Vbot_Vsbd_max, Vbot_Vsbd_min-0.0001, (-1)*Vbot_Vsbd_step), Icp_DCcorrected[freq_idx]/np.amax(Icp_DCcorrected[freq_idx]), marker='.')
+                    axe_norm, = plt.plot(np.arange(Vbot_Vsbd_max, Vbot_Vsbd_min-0.0001, (-1)*Vbot_Vsbd_step), Icp_DCcorrected[freq_idx]/np.amax(Icp_DCcorrected[freq_idx]), marker='.', color=color_list[curve_idx])
                     #add the raw current curves under 5MHz and 1kHz
                     plt.figure(3)
-                    plt.plot(np.arange(Vbot_Vsbd_max, Vbot_Vsbd_min-0.0001, (-1)*Vbot_Vsbd_step), Isub_pumping[freq_idx], marker='.', linestyle='dotted')
+                    plt.plot(np.arange(Vbot_Vsbd_max, Vbot_Vsbd_min-0.0001, (-1)*Vbot_Vsbd_step), Isub_pumping[freq_idx], marker='.', linestyle='dotted', color=color_list[curve_idx])
                     #add the raw current curves under 5MHz and 1kHz
-                    axe_raw, = plt.plot(np.arange(Vbot_Vsbd_max, Vbot_Vsbd_min-0.0001, (-1)*Vbot_Vsbd_step), Isub_pumping[DCcorrection_freq_idx[curve_idx]], marker='.')
+                    axe_raw, = plt.plot(np.arange(Vbot_Vsbd_max, Vbot_Vsbd_min-0.0001, (-1)*Vbot_Vsbd_step), Isub_pumping[DCcorrection_freq_idx[curve_idx]], marker='.', color=color_list[curve_idx])
                 axe_handle.append(axe)
                 axe_norm_handle.append(axe_norm)
                 axe_raw_handle.append(axe_raw) #add the raw current curves under 5MHz and 1kHz
