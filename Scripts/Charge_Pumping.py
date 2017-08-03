@@ -256,7 +256,7 @@ def Charge_Pumping_compare(chips, curve_legend, col, L, Nfin, VT_flavor, Nrow, d
     axe_norm_handle = []
     axe_raw_handle = []#add the raw current curves under 5MHz and 1kHz
                  
-    color_list = ['blue', 'red', 'yellow', 'lime', 'orange', 'darkviolet', 'crimson', 'lightseagreen', 'olive', 'orchid', 'cyan', 'black']
+    color_list = ['blue', 'k', 'm', 'red', 'yellow', 'lime', 'orange', 'darkviolet', 'olive', 'orchid', 'cyan', 'lightseagreen', 'crimson']
 
     for (curve_idx, data_file) in zip(range(len(data_files)), data_files):
         """
@@ -296,6 +296,7 @@ def Charge_Pumping_compare(chips, curve_legend, col, L, Nfin, VT_flavor, Nrow, d
                 if VSBD_descend == 1:
                     plt.figure(1)
                     axe, = plt.plot(np.arange(Vbot_Vsbd_min, Vbot_Vsbd_max+0.0001, Vbot_Vsbd_step), Icp_DCcorrected[freq_idx], marker='.', color=color_list[curve_idx])
+                    print(np.amax(Icp_DCcorrected[freq_idx]))
                     plt.figure(2)
                     axe_norm, = plt.plot(np.arange(Vbot_Vsbd_min, Vbot_Vsbd_max+0.0001, Vbot_Vsbd_step), Icp_DCcorrected[freq_idx]/np.amax(Icp_DCcorrected[freq_idx]), marker='.', color=color_list[curve_idx])
                     #add the raw current curves under 5MHz and 1kHz
@@ -305,6 +306,7 @@ def Charge_Pumping_compare(chips, curve_legend, col, L, Nfin, VT_flavor, Nrow, d
                 if VSBD_descend == 0:
                     plt.figure(1)
                     axe, = plt.plot(np.arange(Vbot_Vsbd_max, Vbot_Vsbd_min-0.0001, (-1)*Vbot_Vsbd_step), Icp_DCcorrected[freq_idx], marker='.', color=color_list[curve_idx])
+                    print(np.amax(Icp_DCcorrected[freq_idx]))
                     plt.figure(2)
                     axe_norm, = plt.plot(np.arange(Vbot_Vsbd_max, Vbot_Vsbd_min-0.0001, (-1)*Vbot_Vsbd_step), Icp_DCcorrected[freq_idx]/np.amax(Icp_DCcorrected[freq_idx]), marker='.', color=color_list[curve_idx])
                     #add the raw current curves under 5MHz and 1kHz
@@ -322,7 +324,10 @@ def Charge_Pumping_compare(chips, curve_legend, col, L, Nfin, VT_flavor, Nrow, d
     plt.xlim(Vbot_Vsbd_min, Vbot_Vsbd_max)
     plt.xlabel('Vbot - Vsbd (V)')
     plt.ylabel('Icp = Isub_with_pumping-Isub_with_pumping @' + freq_DCcorrection +' (nA)')
+    #plt.xlabel('Vbase (V)')
+    #plt.ylabel('Icp (nA)')
     plt.grid()
+    #plt.legend(axe_handle, curve_legend, fontsize = 12)
     plt.legend(axe_handle, curve_legend, fontsize = 8)
     plt.savefig(path_plot+plot_file+'_Col'+str(col).zfill(2)+'_Pumping_minus_DCcorrection.pdf')
     plt.close()

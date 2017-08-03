@@ -51,7 +51,7 @@ def hist_IDS_VGS(VG_idx, chip, col, L, Nfin, VT_flavor, Nrow, data_files, colors
     #figN = figN + 1
     plt.close()
 
-def IDS_VGS(chip, col, L, Nfin, VT_flavor, Nrow, data_files, colors, path_plot, plot_file, row_idx, title, Ymax, VD = 0.8, VG_min = 0.2, VG_max = 0.8):
+def IDS_VGS(chip, col, L, Nfin, VT_flavor, Nrow, data_files, colors, path_plot, plot_file, row_idx, title, Ymax, IV_group_legend = [], VD = 0.8, VG_min = 0.2, VG_max = 0.8):
 
     if os.path.isdir(path_plot) == False:
         os.mkdir(path_plot)
@@ -59,6 +59,7 @@ def IDS_VGS(chip, col, L, Nfin, VT_flavor, Nrow, data_files, colors, path_plot, 
     VDD_WL = np.arange(VG_max, VG_min -0.0001, -0.05)
     #Ymax = 0
 #    for direction in ['VAsource_VBdrain', 'VAdrain_VBsource']:
+    IV_group = []
     for (data_file, color) in zip(data_files, colors):
         Isense = []
         #f=open(path_data+'Fresh_Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_Ids_Vgs_'+direction,'rU')
@@ -81,8 +82,12 @@ def IDS_VGS(chip, col, L, Nfin, VT_flavor, Nrow, data_files, colors, path_plot, 
         #plt.figure(figN)
         #plt.title('L='+str(L)+', Nfin='+str(Nfin)+', '+VT_flavor+', #'+str(Nrow)+' fresh nmos IDS-VGS curves', fontsize=10)
         for row in row_idx:
-            plt.plot(VDD_WL, 1e6*IDS_VGS[row], color=color, linestyle='solid', marker='.', alpha = 0.4)
+            fig, = plt.plot(VDD_WL, 1e6*IDS_VGS[row], color=color, linestyle='solid', marker='.', alpha = 0.4)
+        IV_group.append(fig)
+
     plt.title('L='+str(L)+', Nfin='+str(Nfin)+', '+VT_flavor+', '+title+' IDS-VGS curves', fontsize=7)
+    if (len(IV_group_legend) != 0):
+        plt.legend(IV_group, IV_group_legend, loc = 'best')
     plt.axis([VG_min, VG_max, 0, Ymax])
     plt.xlabel('VGS (V)')
     plt.ylabel('IDS (uA)')
