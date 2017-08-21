@@ -171,6 +171,55 @@ def IDS_VGS_stress(chip, col, L, Nfin, VT_flavor, Nrow, VGS, VDS, Nhci, Npbti, V
             plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_'+direction+'_'+str(cycle+1)+'.pdf')
             plt.close()
 
+
+def IDSAT_vs_row(chip, col, L, Nfin, VT_flavor, Nrow, data_files, colors, path_plot, plot_file, row_idx, title, Ymax, IV_group_legend = [], VD = 0.8, VG_min = 0.2, VG_max = 0.8):
+
+    """ Directly adapted from IDS_VGS, plot IDSAT vs row index (location) to check whether there's any systematic variation (indicative of IR drop), and also check the cell-to-cell variation"""
+
+    if os.path.isdir(path_plot) == False:
+        os.mkdir(path_plot)
+
+    VDD_WL = np.arange(VG_max, VG_min -0.0001, -0.05)
+    #Ymax = 0
+#    for direction in ['VAsource_VBdrain', 'VAdrain_VBsource']:
+    IV_group = []
+    for (data_file, color) in zip(data_files, colors):
+        Isense = []
+        #f=open(path_data+'Fresh_Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_Ids_Vgs_'+direction,'rU')
+        f=open(data_file,'rU')
+        Isense.append(re.findall(r'Isense=(-*\d*\.\d+)',f.read()))
+        f.close()
+        print(len(Isense), len(Isense[0]))
+        if (len(Isense) != 1 or len(Isense[0]) != (Nrow+1)*len(VDD_WL)):
+            print('data file error!')
+        #I_leak_VAsource_VBdrain = np.zeros(len(VDD_WL))
+        #I_leak_VAdrain_VBsource = np.zeros(len(VDD_WL))
+        #for k in np.arange(len(VDD_WL)):
+        #    I_leak_VAsource_VBdrain[k] = np.float64(Isense_VAsource_VBdrain[k][0])
+        #    I_leak_VAdrain_VBsource[k] = np.float64(Isense_VAdrain_VBsource[k][0])
+        IDS_VGS = np.zeros((Nrow, len(VDD_WL)))
+        for row in np.arange(0, Nrow):
+            IDS_VGS[row][:] = np.array(np.float64(Isense[0][(row+1)*len(VDD_WL): (row+2)*len(VDD_WL)]))
+
+        #Ymax = max(1e6 * np.amax(IDS_VGS), Ymax)
+        #plt.figure(figN)
+        #plt.title('L='+str(L)+', Nfin='+str(Nfin)+', '+VT_flavor+', #'+str(Nrow)+' fresh nmos IDS-VGS curves', fontsize=10)
+        fig, = plt.plot(row_idx, 1e6*IDS_VGS[row_idx,[0]*len(row_idx)], color=color, linestyle='solid', marker='.', alpha = 1.0)
+        IV_group.append(fig)
+
+    plt.title('L='+str(L)+', Nfin='+str(Nfin)+', '+VT_flavor+', '+title+' IDSAT vs row index/location', fontsize=7)
+    if (len(IV_group_legend) != 0):
+        plt.legend(IV_group, IV_group_legend, loc = 'best', fontsize = 7)
+    #plt.axis([VG_min, VG_max, 0, Ymax])
+    plt.xlim(min(row_idx), max(row_idx))
+    plt.xlabel('row index')
+    plt.ylabel('IDSAT (uA)')
+    plt.grid()
+    plt.savefig(path_plot+plot_file+'Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'.pdf')
+    #plt.savefig(path_plot+'IDS_VGS_'+str(figN).zfill(2)+'_Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_'+direction+'.pdf')
+    plt.close()
+
+
 if __name__ == '__main__':
   main()
 
