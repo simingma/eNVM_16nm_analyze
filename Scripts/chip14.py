@@ -16,6 +16,27 @@ from MLC_IDSAT import MLC_IDSAT_characterization, MLC_IDSAT_algorithm_naivete, M
 
 def main():
     
+    #for row_start in np.arange(0, 128):
+    #    MLC_IDSAT_algorithm_rv1(14, 33, 16, 2, 'ULVT', 1.8, 2.0, 128, [row_start], [71, 55, 46, 35], [0.002, 0.01, 0.04, 0.2], 4, [], '', ['../Data/chip14/MLC_programming_Chip14_Col33_2msPULSE_VG1p8_VD2p0_VAsource_VBdrain_01', '../Data/chip14/MLC_programming_Chip14_Col33_10msPULSE_VG1p8_VD2p0_VAsource_VBdrain_02', '../Data/chip14/MLC_programming_Chip14_Col33_40msPULSE_VG1p8_VD2p0_VAsource_VBdrain_03', '../Data/chip14/MLC_programming_Chip14_Col33_200msPULSE_VG1p8_VD2p0_VAsource_VBdrain_04'], '../Plots/chip14/', 'VG1p8_VD2p0', '_cycle01020304_row'+str(row_start).zfill(3), Imin=12, Imax=136)
+
+    MLC_IDSAT_algorithm_rv1(14, 33, 16, 2, 'ULVT', 1.8, 2.0, 128, range(0, 128), [71, 55, 46, 35], [0.002, 0.01, 0.04, 0.2], 4, [], '', ['../Data/chip14/MLC_programming_Chip14_Col33_2msPULSE_VG1p8_VD2p0_VAsource_VBdrain_01', '../Data/chip14/MLC_programming_Chip14_Col33_10msPULSE_VG1p8_VD2p0_VAsource_VBdrain_02', '../Data/chip14/MLC_programming_Chip14_Col33_40msPULSE_VG1p8_VD2p0_VAsource_VBdrain_03', '../Data/chip14/MLC_programming_Chip14_Col33_200msPULSE_VG1p8_VD2p0_VAsource_VBdrain_04'], '../Plots/chip14/', 'VG1p8_VD2p0', '_cycle01020304_all')
+
+    #IDS_VGS(14, 33, 16, 2, 'ULVT', 128, ['../Data/chip14/Fresh_Chip14_Col33_Ids_Vgs_VAsource_VBdrain', '../Data/chip14/MLC_Chip14_Col33_2msPULSE_VG1p8_VD2p0_Ids_Vgs_VAsource_VBdrain_01', '../Data/chip14/MLC_Chip14_Col33_10msPULSE_VG1p8_VD2p0_Ids_Vgs_VAsource_VBdrain_02', '../Data/chip14/MLC_Chip14_Col33_40msPULSE_VG1p8_VD2p0_Ids_Vgs_VAsource_VBdrain_03', '../Data/chip14/MLC_Chip14_Col33_200msPULSE_VG1p8_VD2p0_Ids_Vgs_VAsource_VBdrain_04'], ['b', 'y', 'r', 'k', 'g'], '../Plots/chip14/', 'Fresh_vs_MLC01020304_VG1p8_VD2p0_IDS-VGS_VaS-VbD_', range(0, 128), 'Fresh vs MLC-1-2-3-4 (VG=1.8, VD=2.0)\nMLC-{1, 2, 3, 4}: {2ms, 10ms, 40ms, 200ms} WL pulses, IDSAT threshold = {90, 70, 50, 30}uA, forward' , 150, ['fresh', 'MLC-01', 'MLC-02', 'MLC-03', 'MLC-04']) 
+    #IDS_VGS(14, 33, 16, 2, 'ULVT', 128, ['../Data/chip14/Fresh_Chip14_Col33_Ids_Vgs_VAdrain_VBsource', '../Data/chip14/MLC_Chip14_Col33_2msPULSE_VG1p8_VD2p0_Ids_Vgs_VAdrain_VBsource_01', '../Data/chip14/MLC_Chip14_Col33_10msPULSE_VG1p8_VD2p0_Ids_Vgs_VAdrain_VBsource_02', '../Data/chip14/MLC_Chip14_Col33_40msPULSE_VG1p8_VD2p0_Ids_Vgs_VAdrain_VBsource_03', '../Data/chip14/MLC_Chip14_Col33_200msPULSE_VG1p8_VD2p0_Ids_Vgs_VAdrain_VBsource_04'], ['b', 'y', 'r', 'k', 'g'], '../Plots/chip14/', 'Fresh_vs_MLC01020304_VG1p8_VD2p0_IDS-VGS_VaD-VbS_', range(0, 128), 'Fresh vs MLC-1-2-3-4 (VG=1.8, VD=2.0)\nMLC-{1, 2, 3, 4}: {2ms, 10ms, 40ms, 200ms} WL pulses, IDSAT threshold = {90, 70, 50, 30}uA, reversed', 150, ['fresh', 'MLC-01', 'MLC-02', 'MLC-03', 'MLC-04']) 
+
+    #hist_IDS_VGS(0, 14, 33, 16, 2, 'ULVT', 128, ['../Data/chip14/Fresh_Chip14_Col33_Ids_Vgs_VAdrain_VBsource', '../Data/chip14/MLC_Chip14_Col33_2msPULSE_VG1p8_VD2p0_Ids_Vgs_VAdrain_VBsource_01', '../Data/chip14/MLC_Chip14_Col33_10msPULSE_VG1p8_VD2p0_Ids_Vgs_VAdrain_VBsource_02', '../Data/chip14/MLC_Chip14_Col33_40msPULSE_VG1p8_VD2p0_Ids_Vgs_VAdrain_VBsource_03', '../Data/chip14/MLC_Chip14_Col33_200msPULSE_VG1p8_VD2p0_Ids_Vgs_VAdrain_VBsource_04'], ['b', 'y', 'r', 'k', 'g'], '../Plots/chip14/', 'Hist-IDSAT_MLC-rv1-01020304_reverse-read_', range(0, 128), 'MLC programming {2ms, 10ms, 40ms, 200ms} pulses, VGS=1.8, VDS=2.0 for level=1-2-3-4\nhistogram of read-IDSAT (VGS=VDS=0.8V)', 0, 150, 0, 150, 1000)
+    #
+    #t_label = []
+    #for t in np.arange(0, 0.002*(71) + 0.0001, 0.002):
+    #    t_label.append(str(t))
+    #
+    ##MLC_IDSAT_algorithm_rv1(14, 33, 16, 2, 'ULVT', 1.8, 2.0, 128, [21], [71], [0.002], 1, np.arange(0, 0.002*(71)+0.0001, 0.002), t_label, ['../Data/chip14/MLC_programming_Chip14_Col33_2msPULSE_VG1p8_VD2p0_VAsource_VBdrain_01'], '../Plots/chip14/', 'VG1p8_VD2p0', '_rv1_cycle01_row-21', Imin=82, Imax=142)
+
+    #for row_start in np.arange(0, 128):
+    #    MLC_IDSAT_algorithm_rv1(14, 33, 16, 2, 'ULVT', 1.8, 2.0, 128, [row_start], [71], [0.002], 1, np.arange(0, 0.002*(71)+0.0001, 0.002), t_label, ['../Data/chip14/MLC_programming_Chip14_Col33_2msPULSE_VG1p8_VD2p0_VAsource_VBdrain_01'], '../Plots/chip14/', 'VG1p8_VD2p0', '_rv1_cycle01_row_'+str(row_start).zfill(3), Imin=80, Imax=142)
+
+    #MLC_IDSAT_algorithm_rv1(14, 33, 16, 2, 'ULVT', 1.8, 2.0, 128, range(0, 128), [71], [0.002], 1, np.arange(0, 0.002*(71)+0.0001, 0.002), t_label, ['../Data/chip14/MLC_programming_Chip14_Col33_2msPULSE_VG1p8_VD2p0_VAsource_VBdrain_01'], '../Plots/chip14/', 'VG1p8_VD2p0', '_rv1_cycle01', Imin=80, Imax=142)
+
     #MLC_IDSAT_characterization(11, 30, 16, 2, 'ULVT', 1.8, 1.7, 32, range(0, 16) , [40], [0.01], 1, [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5], ['0', '0.05', '0.1', '0.15', '0.2', '0.25', '0.3', '0.35', '0.4', 'recover'], ['../Data/chip11/Chip11_Col30_HCI_40x10ms_stress_VG_ConstPulse_VAsource_VBdrain_01'], '../Plots/chip11/', 'VG1p8_VD1p7', '_cycle01', 50, 160, 1)
     #MLC_IDSAT_characterization(11, 30, 16, 2, 'ULVT', 1.8, 2.0, 32, range(16, 32), [40], [0.01], 1, [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5], ['0', '0.05', '0.1', '0.15', '0.2', '0.25', '0.3', '0.35', '0.4', 'recover'], ['../Data/chip11/Chip11_Col30_HCI_40x10ms_stress_VG_ConstPulse_VAsource_VBdrain_01'], '../Plots/chip11/', 'VG1p8_VD2p0', '_cycle01', 20, 160, 1)
 
@@ -128,74 +149,56 @@ def main():
                 (16, 2, 'ULVT', 32 , 150), (16, 2, 'LVT', 32 , 125), (16, 2, 'SVT', 32 , 115),
                 (16, 2, 'ULVT', 128, 150), (16, 2, 'LVT', 128, 125), (16, 2, 'SVT', 128, 115)]
 
-    #MLC_IDSAT_algorithm_rv1(11, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(0, 128), [135+20], [0.002], 1, np.arange(0, 0.01*16+0.0001, 0.01), '', ['../Data/chip11/MLC_programming_Chip11_Col21_2msPULSE_VG1p8_VD2p4_VAsource_VBdrain_01'], '../Plots/chip11/', 'VG1p8_VD2p4', '_rv1_cycle01_EfficientPython')
+    #MLC_IDSAT_algorithm_rv1(11, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(0, 128), [135+20], [0.2], 1, np.arange(0, 0.01*16+0.0001, 0.01), '', ['../Data/chip11/MLC_programming_Chip11_Col21_2msPULSE_VG1p8_VD2p4_VAsource_VBdrain_01'], '../Plots/chip11/', 'VG1p8_VD2p4', '_rv1_cycle01_EfficientPython')
 
-    #MLC_IDSAT_algorithm_rv1(11, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(0, 128), [135+20, 108+30, 89+35, 90+22], [0.002, 0.01, 0.04, 0.2], 4, [0, 0.31, 0.41, 1.79, 1.89, 6.85, 6.95, 29.35], ['0', '0.31', '0.31', '1.69', '1.69', '6.65', '6.65', '29.05'], ['../Data/chip11/MLC_programming_Chip11_Col21_2msPULSE_VG1p8_VD2p4_VAsource_VBdrain_01', '../Data/chip11/MLC_programming_Chip11_Col21_10msPULSE_VG1p8_VD2p4_VAsource_VBdrain_02', '../Data/chip11/MLC_programming_Chip11_Col21_40msPULSE_VG1p8_VD2p4_VAsource_VBdrain_03', '../Data/chip11/MLC_programming_Chip11_Col21_200msPULSE_VG1p8_VD2p4_VAsource_VBdrain_04'], '../Plots/chip11/', 'VG1p8_VD2p4', '_rv1_cycle01020304')
+    #MLC_IDSAT_algorithm_rv1(12, 21, 36, 2, 'ULVT', '0.9-1.2-1.5-1.8', 2.4, 128, range(0, 128), [59+16, 72+40, 80+31, 68+23], [0.2, 0.2, 0.2, 0.2], 4, [0, 15, 15.1, 37.5, 37.6, 59.8, 59.9, 78.1], ['0', '15', '', '37.4', '', '59.6', '', '77.8'], ['../Data/chip12/MLC_programming_Chip12_Col21_200msPULSE_VG0p9_VD2p4_VAsource_VBdrain_01', '../Data/chip12/MLC_programming_Chip12_Col21_200msPULSE_VG1p2_VD2p4_VAsource_VBdrain_02', '../Data/chip12/MLC_programming_Chip12_Col21_200msPULSE_VG1p5_VD2p4_VAsource_VBdrain_03', '../Data/chip12/MLC_programming_Chip12_Col21_200msPULSE_VG1p8_VD2p4_VAsource_VBdrain_04'], '../Plots/chip12/', 'VG-0p9-1p2-1p5-1p8_VD2p4', '_rv1_cycle01020304')
 
-    #for row_start in np.arange(0, 128):
-    #    MLC_IDSAT_algorithm_rv1(11, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, [row_start], [135+20, 108+30, 89+35, 90+22], [0.002, 0.01, 0.04, 0.2], 4, [], '', ['../Data/chip11/MLC_programming_Chip11_Col21_2msPULSE_VG1p8_VD2p4_VAsource_VBdrain_01', '../Data/chip11/MLC_programming_Chip11_Col21_10msPULSE_VG1p8_VD2p4_VAsource_VBdrain_02', '../Data/chip11/MLC_programming_Chip11_Col21_40msPULSE_VG1p8_VD2p4_VAsource_VBdrain_03', '../Data/chip11/MLC_programming_Chip11_Col21_200msPULSE_VG1p8_VD2p4_VAsource_VBdrain_04'], '../Plots/chip11/', 'VG1p8_VD2p4', '_rv1_cycle01020304_row'+str(row_start).zfill(3), Imin=12, Imax=136)
-
-    #MLC_IDSAT_algorithm_rv1(11, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(0, 128), [135+20, 108+30, 89+35, 90+22], [0.002, 0.01, 0.04, 0.2], 4, [], '', ['../Data/chip11/MLC_programming_Chip11_Col21_2msPULSE_VG1p8_VD2p4_VAsource_VBdrain_01', '../Data/chip11/MLC_programming_Chip11_Col21_10msPULSE_VG1p8_VD2p4_VAsource_VBdrain_02', '../Data/chip11/MLC_programming_Chip11_Col21_40msPULSE_VG1p8_VD2p4_VAsource_VBdrain_03', '../Data/chip11/MLC_programming_Chip11_Col21_200msPULSE_VG1p8_VD2p4_VAsource_VBdrain_04'], '../Plots/chip11/', 'VG1p8_VD2p4', '_rv1_cycle01020304_all')
-    #t_ratio_lst = [(0, 0.17), (0.16, 0.34), (0.33, 0.505), (0.495, 0.67), (0.66, 0.84), (0.83, 1)]
+    t_ratio_lst = [(0, 0.17), (0.16, 0.34), (0.33, 0.505), (0.495, 0.67), (0.66, 0.84), (0.83, 1)]
 
     #t_label = []
-    #for t in np.arange(0, 0.002*(135+20) + 0.0001, 0.002):
+    #for t in np.arange(0, 0.2*(59+16) + 0.0001, 0.2):
     #    t_label.append(str(t))
-    #
-    #for row_start in np.arange(0, 128):
-    #    MLC_IDSAT_algorithm_rv1(11, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, [row_start], [135+20], [0.002], 1, np.arange(0, 0.002*(135+20)+0.0001, 0.002), t_label, ['../Data/chip11/MLC_programming_Chip11_Col21_2msPULSE_VG1p8_VD2p4_VAsource_VBdrain_01'], '../Plots/chip11/', 'VG1p8_VD2p4', '_rv1_cycle01_row_'+str(row_start).zfill(3), Imin=74, Imax=136)
-
-    #t_label = []
-    #for t in np.arange(0, 0.01*(108+30) + 0.0001, 0.01):
-    #    t_label.append(str(0.002*(135+20) + t))
-
-    for row_start in np.arange(0, 128):
-        MLC_IDSAT_algorithm_rv1(11, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, [row_start], [89+35], [0.04], 1, [], '', ['../Data/chip11/MLC_programming_Chip11_Col21_40msPULSE_VG1p8_VD2p4_VAsource_VBdrain_03'], '../Plots/chip11/', 'VG1p8_VD2p4', '_rv1_cycle03_row'+str(row_start).zfill(3), Imin=32, Imax=80)
-        MLC_IDSAT_algorithm_rv1(11, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, [row_start], [90+22], [0.2], 1, [], '', ['../Data/chip11/MLC_programming_Chip11_Col21_200msPULSE_VG1p8_VD2p4_VAsource_VBdrain_04'], '../Plots/chip11/', 'VG1p8_VD2p4', '_rv1_cycle04_row'+str(row_start).zfill(3), Imin=12, Imax=60)
-        #MLC_IDSAT_algorithm_rv1(11, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, [row_start], [108+30], [0.01], 1, np.arange(0, 0.01*(108+30)+0.0001, 0.01), t_label, ['../Data/chip11/MLC_programming_Chip11_Col21_10msPULSE_VG1p8_VD2p4_VAsource_VBdrain_02'], '../Plots/chip11/', 'VG1p8_VD2p4', '_rv1_cycle02_row'+str(row_start).zfill(3), Imin=52, Imax=100)
-    #MLC_IDSAT_algorithm_rv1(11, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(0, 128), [108+30], [0.01], 1, np.arange(0, 0.01*(108+30)+0.0001, 0.01), t_label, ['../Data/chip11/MLC_programming_Chip11_Col21_10msPULSE_VG1p8_VD2p4_VAsource_VBdrain_02'], '../Plots/chip11/', 'VG1p8_VD2p4', '_rv1_cycle02', Imin=52, Imax=100)
-
-    #MLC_IDSAT_algorithm_rv1(11, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(0, 128), [135+20], [0.002], 1, np.arange(0, 0.002*(135+20)+0.0001, 0.002), t_label, ['../Data/chip11/MLC_programming_Chip11_Col21_2msPULSE_VG1p8_VD2p4_VAsource_VBdrain_01'], '../Plots/chip11/', 'VG1p8_VD2p4', '_rv1_cycle01')
+    #MLC_IDSAT_algorithm_rv1(12, 21, 36, 2, 'ULVT', 0.9, 2.4, 128, range(0, 128), [59+16], [0.2], 1, np.arange(0, 0.2*(59+16)+0.0001, 0.2), t_label, ['../Data/chip12/MLC_programming_Chip12_Col21_200msPULSE_VG0p9_VD2p4_VAsource_VBdrain_01'], '../Plots/chip12/', 'VG0p9_VD2p4', '_rv1_cycle01')
     #for row_start in np.arange(0, 128, 8):
-    #    MLC_IDSAT_algorithm_rv1(11, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(row_start, row_start+8), [135+20], [0.002], 1, np.arange(0, 0.002*(135+20)+0.0001, 0.002), t_label, ['../Data/chip11/MLC_programming_Chip11_Col21_2msPULSE_VG1p8_VD2p4_VAsource_VBdrain_01'], '../Plots/chip11/', 'VG1p8_VD2p4', '_rv1_cycle01_row'+str(row_start)+'_to_'+str(row_start+7))
+    #    MLC_IDSAT_algorithm_rv1(12, 21, 36, 2, 'ULVT', 0.9, 2.4, 128, range(row_start, row_start+8), [59+16], [0.2], 1, np.arange(0, 0.2*(59+16)+0.0001, 0.2), t_label, ['../Data/chip12/MLC_programming_Chip12_Col21_200msPULSE_VG0p9_VD2p4_VAsource_VBdrain_01'], '../Plots/chip12/', 'VG0p9_VD2p4', '_rv1_cycle01_row'+str(row_start)+'_to_'+str(row_start+7))
     #    segment=0
     #    for t_ratio in t_ratio_lst:
-    #        MLC_IDSAT_algorithm_rv1(11, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(row_start, row_start+8), [135+20], [0.002], 1, np.arange(0, 0.002*(135+20)+0.0001, 0.002), t_label, ['../Data/chip11/MLC_programming_Chip11_Col21_2msPULSE_VG1p8_VD2p4_VAsource_VBdrain_01'], '../Plots/chip11/', 'VG1p8_VD2p4', '_rv1_cycle01_row'+str(row_start)+'_to_'+str(row_start+7)+'_'+str(segment), [t_ratio[0]*0.002*(135+20), t_ratio[1]*0.002*(135+20)])
+    #        MLC_IDSAT_algorithm_rv1(12, 21, 36, 2, 'ULVT', 0.9, 2.4, 128, range(row_start, row_start+8), [59+16], [0.2], 1, np.arange(0, 0.2*(59+16)+0.0001, 0.2), t_label, ['../Data/chip12/MLC_programming_Chip12_Col21_200msPULSE_VG0p9_VD2p4_VAsource_VBdrain_01'], '../Plots/chip12/', 'VG0p9_VD2p4', '_rv1_cycle01_row'+str(row_start)+'_to_'+str(row_start+7)+'_'+str(segment), [t_ratio[0]*0.2*(59+16), t_ratio[1]*0.2*(59+16)])
     #        segment += 1
 
     #t_label = []
-    #for t in np.arange(0, 0.01*(108+30) + 0.0001, 0.01):
-    #    t_label.append(str(0.002*(135+20) + t))
-    #MLC_IDSAT_algorithm_rv1(11, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(0, 128), [108+30], [0.01], 1, np.arange(0, 0.01*(108+30)+0.0001, 0.01), t_label, ['../Data/chip11/MLC_programming_Chip11_Col21_10msPULSE_VG1p8_VD2p4_VAsource_VBdrain_02'], '../Plots/chip11/', 'VG1p8_VD2p4', '_rv1_cycle02')
+    #for t in np.arange(0, 0.2*(72+40) + 0.0001, 0.2):
+    #    t_label.append(str(0.2*(59+16) + t))
+    #MLC_IDSAT_algorithm_rv1(12, 21, 36, 2, 'ULVT', 1.2, 2.4, 128, range(0, 128), [72+40], [0.2], 1, np.arange(0, 0.2*(72+40)+0.0001, 0.2), t_label, ['../Data/chip12/MLC_programming_Chip12_Col21_200msPULSE_VG1p2_VD2p4_VAsource_VBdrain_02'], '../Plots/chip12/', 'VG1p2_VD2p4', '_rv1_cycle02')
     #for row_start in np.arange(0, 128, 8):
-    #    #MLC_IDSAT_algorithm_rv1(11, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(row_start, row_start+8), [108+30], [0.01], 1, np.arange(0, 0.01*(108+30)+0.0001, 0.01), t_label, ['../Data/chip11/MLC_programming_Chip11_Col21_10msPULSE_VG1p8_VD2p4_VAsource_VBdrain_02'], '../Plots/chip11/', 'VG1p8_VD2p4', '_rv1_cycle02_row'+str(row_start)+'_to_'+str(row_start+7))
+    #    MLC_IDSAT_algorithm_rv1(12, 21, 36, 2, 'ULVT', 1.2, 2.4, 128, range(row_start, row_start+8), [72+40], [0.2], 1, np.arange(0, 0.2*(72+40)+0.0001, 0.2), t_label, ['../Data/chip12/MLC_programming_Chip12_Col21_200msPULSE_VG1p2_VD2p4_VAsource_VBdrain_02'], '../Plots/chip12/', 'VG1p2_VD2p4', '_rv1_cycle02_row'+str(row_start)+'_to_'+str(row_start+7))
     #    segment=0
     #    for t_ratio in t_ratio_lst:
-    #        MLC_IDSAT_algorithm_rv1(11, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(row_start, row_start+8), [108+30], [0.01], 1, np.arange(0, 0.01*(108+30)+0.0001, 0.01), t_label, ['../Data/chip11/MLC_programming_Chip11_Col21_10msPULSE_VG1p8_VD2p4_VAsource_VBdrain_02'], '../Plots/chip11/', 'VG1p8_VD2p4', '_rv1_cycle02_row'+str(row_start)+'_to_'+str(row_start+7)+'_'+str(segment), [t_ratio[0]*0.01*(108+30), t_ratio[1]*0.01*(108+30)])
+    #        MLC_IDSAT_algorithm_rv1(12, 21, 36, 2, 'ULVT', 1.2, 2.4, 128, range(row_start, row_start+8), [72+40], [0.2], 1, np.arange(0, 0.2*(72+40)+0.0001, 0.2), t_label, ['../Data/chip12/MLC_programming_Chip12_Col21_200msPULSE_VG1p2_VD2p4_VAsource_VBdrain_02'], '../Plots/chip12/', 'VG1p2_VD2p4', '_rv1_cycle02_row'+str(row_start)+'_to_'+str(row_start+7)+'_'+str(segment), [t_ratio[0]*0.2*(72+40), t_ratio[1]*0.2*(72+40)])
     #        segment += 1
 
 
     #t_label = []
-    #for t in np.arange(0, 0.04*(89+35) + 0.0001, 0.04):
-    #    t_label.append(str(0.002*(135+20) + 0.01*(108+30) + t))
-    #MLC_IDSAT_algorithm_rv1(11, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(0, 128), [89+35], [0.04], 1, np.arange(0, 0.04*(89+35)+0.0001, 0.04), t_label, ['../Data/chip11/MLC_programming_Chip11_Col21_40msPULSE_VG1p8_VD2p4_VAsource_VBdrain_03'], '../Plots/chip11/', 'VG1p8_VD2p4', '_rv1_cycle03')
+    #for t in np.arange(0, 0.2*(80+31) + 0.0001, 0.2):
+    #    t_label.append(str(0.2*(59+16) + 0.2*(72+40) + t))
+    ##MLC_IDSAT_algorithm_rv1(12, 21, 36, 2, 'ULVT', 1.5, 2.4, 128, range(0, 128), [80+31], [0.2], 1, np.arange(0, 0.2*(80+31)+0.0001, 0.2), t_label, ['../Data/chip12/MLC_programming_Chip12_Col21_200msPULSE_VG1p5_VD2p4_VAsource_VBdrain_03'], '../Plots/chip12/', 'VG1p5_VD2p4', '_rv1_cycle03')
     #for row_start in np.arange(0, 128, 8):
-    #    #MLC_IDSAT_algorithm_rv1(11, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(row_start, row_start+8), [89+35], [0.04], 1, np.arange(0, 0.04*(89+35)+0.0001, 0.04), t_label, ['../Data/chip11/MLC_programming_Chip11_Col21_40msPULSE_VG1p8_VD2p4_VAsource_VBdrain_03'], '../Plots/chip11/', 'VG1p8_VD2p4', '_rv1_cycle03_row'+str(row_start)+'_to_'+str(row_start+7))
+    #    MLC_IDSAT_algorithm_rv1(12, 21, 36, 2, 'ULVT', 1.5, 2.4, 128, range(row_start, row_start+8), [80+31], [0.2], 1, np.arange(0, 0.2*(80+31)+0.0001, 0.2), t_label, ['../Data/chip12/MLC_programming_Chip12_Col21_200msPULSE_VG1p5_VD2p4_VAsource_VBdrain_03'], '../Plots/chip12/', 'VG1p5_VD2p4', '_rv1_cycle03_row'+str(row_start)+'_to_'+str(row_start+7))
     #    segment=0
     #    for t_ratio in t_ratio_lst:
-    #        MLC_IDSAT_algorithm_rv1(11, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(row_start, row_start+8), [89+35], [0.04], 1, np.arange(0, 0.04*(89+35)+0.0001, 0.04), t_label, ['../Data/chip11/MLC_programming_Chip11_Col21_40msPULSE_VG1p8_VD2p4_VAsource_VBdrain_03'], '../Plots/chip11/', 'VG1p8_VD2p4', '_rv1_cycle03_row'+str(row_start)+'_to_'+str(row_start+7)+'_'+str(segment), [t_ratio[0]*0.04*(89+35), t_ratio[1]*0.04*(89+35)])
+    #        MLC_IDSAT_algorithm_rv1(12, 21, 36, 2, 'ULVT', 1.5, 2.4, 128, range(row_start, row_start+8), [80+31], [0.2], 1, np.arange(0, 0.2*(80+31)+0.0001, 0.2), t_label, ['../Data/chip12/MLC_programming_Chip12_Col21_200msPULSE_VG1p5_VD2p4_VAsource_VBdrain_03'], '../Plots/chip12/', 'VG1p5_VD2p4', '_rv1_cycle03_row'+str(row_start)+'_to_'+str(row_start+7)+'_'+str(segment), [t_ratio[0]*0.2*(80+31), t_ratio[1]*0.2*(80+31)])
     #        segment += 1
 
 
     #t_label = []
-    #for t in np.arange(0, 0.2*(90+22) + 0.0001, 0.2):
-    #    t_label.append(str(0.002*(135+20) + 0.01*(108+30) + 0.04*(89+35) + t))
-    #MLC_IDSAT_algorithm_rv1(11, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(0, 128), [90+22], [0.2], 1, np.arange(0, 0.2*(90+22)+0.0001, 0.2), t_label, ['../Data/chip11/MLC_programming_Chip11_Col21_200msPULSE_VG1p8_VD2p4_VAsource_VBdrain_04'], '../Plots/chip11/', 'VG1p8_VD2p4', '_rv1_cycle04')
+    #for t in np.arange(0, 0.2*(68+23) + 0.0001, 0.2):
+    #    t_label.append(str(0.2*(59+16) + 0.2*(72+40) + 0.2*(80+31) + t))
+    #MLC_IDSAT_algorithm_rv1(12, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(0, 128), [68+23], [0.2], 1, np.arange(0, 0.2*(68+23)+0.0001, 0.2), t_label, ['../Data/chip12/MLC_programming_Chip12_Col21_200msPULSE_VG1p8_VD2p4_VAsource_VBdrain_04'], '../Plots/chip12/', 'VG1p8_VD2p4', '_rv1_cycle04')
     #for row_start in np.arange(0, 128, 8):
-    #    #MLC_IDSAT_algorithm_rv1(11, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(row_start, row_start+8), [90+22], [0.2], 1, np.arange(0, 0.2*(90+22)+0.0001, 0.2), t_label, ['../Data/chip11/MLC_programming_Chip11_Col21_200msPULSE_VG1p8_VD2p4_VAsource_VBdrain_04'], '../Plots/chip11/', 'VG1p8_VD2p4', '_rv1_cycle04_row'+str(row_start)+'_to_'+str(row_start+7))
+    #    MLC_IDSAT_algorithm_rv1(12, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(row_start, row_start+8), [68+23], [0.2], 1, np.arange(0, 0.2*(68+23)+0.0001, 0.2), t_label, ['../Data/chip12/MLC_programming_Chip12_Col21_200msPULSE_VG1p8_VD2p4_VAsource_VBdrain_04'], '../Plots/chip12/', 'VG1p8_VD2p4', '_rv1_cycle04_row'+str(row_start)+'_to_'+str(row_start+7))
     #    segment=0
     #    for t_ratio in t_ratio_lst:
-    #        MLC_IDSAT_algorithm_rv1(11, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(row_start, row_start+8), [90+22], [0.2], 1, np.arange(0, 0.2*(90+22)+0.0001, 0.2), t_label, ['../Data/chip11/MLC_programming_Chip11_Col21_200msPULSE_VG1p8_VD2p4_VAsource_VBdrain_04'], '../Plots/chip11/', 'VG1p8_VD2p4', '_rv1_cycle04_row'+str(row_start)+'_to_'+str(row_start+7)+'_'+str(segment), [t_ratio[0]*0.2*(90+22), t_ratio[1]*0.2*(90+22)])
+    #        MLC_IDSAT_algorithm_rv1(12, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(row_start, row_start+8), [68+23], [0.2], 1, np.arange(0, 0.2*(68+23)+0.0001, 0.2), t_label, ['../Data/chip12/MLC_programming_Chip12_Col21_200msPULSE_VG1p8_VD2p4_VAsource_VBdrain_04'], '../Plots/chip12/', 'VG1p8_VD2p4', '_rv1_cycle04_row'+str(row_start)+'_to_'+str(row_start+7)+'_'+str(segment), [t_ratio[0]*0.2*(68+23), t_ratio[1]*0.2*(68+23)])
     #        segment += 1
 
 
@@ -243,8 +246,11 @@ def main():
 
     #hist_IDS_VGS(0, 11, 21, 36, 2, 'ULVT', 128, ['../Data/chip11/Fresh_Chip11_Col21_Ids_Vgs_VAdrain_VBsource', '../Data/chip11/MLC_Chip11_Col21_2msPULSE_VG1p8_VD2p4_Ids_Vgs_VAdrain_VBsource_01', '../Data/chip11/MLC_Chip11_Col21_10msPULSE_VG1p8_VD2p4_Ids_Vgs_VAdrain_VBsource_02', '../Data/chip11/MLC_Chip11_Col21_40msPULSE_VG1p8_VD2p4_Ids_Vgs_VAdrain_VBsource_03', '../Data/chip11/MLC_Chip11_Col21_200msPULSE_VG1p8_VD2p4_Ids_Vgs_VAdrain_VBsource_04'], ['b', 'y', 'r', 'k', 'g'], '../Plots/chip11/', 'Hist-IDSAT_MLC-rv1-01020304_reverse-read_', range(0, 128), 'MLC programming (VGS=1.8, VDS=2.4), histogram of read-IDSAT (VGS=VDS=0.8V)', 0, 136, 0, 136, 1000)
 
-    #IDS_VGS(11, 21, 36, 2, 'ULVT', 128, ['../Data/chip11/Fresh_Chip11_Col21_Ids_Vgs_VAsource_VBdrain', '../Data/chip11/MLC_Chip11_Col21_2msPULSE_VG1p8_VD2p4_Ids_Vgs_VAsource_VBdrain_01', '../Data/chip11/MLC_Chip11_Col21_10msPULSE_VG1p8_VD2p4_Ids_Vgs_VAsource_VBdrain_02', '../Data/chip11/MLC_Chip11_Col21_40msPULSE_VG1p8_VD2p4_Ids_Vgs_VAsource_VBdrain_03', '../Data/chip11/MLC_Chip11_Col21_200msPULSE_VG1p8_VD2p4_Ids_Vgs_VAsource_VBdrain_04'], ['b', 'y', 'r', 'k', 'g'], '../Plots/chip11/', 'Fresh_vs_MLC01020304_VG1p8_VD2p4_IDS-VGS_VaS-VbD_', range(0, 128), 'Fresh vs MLC-1-2-3-4 (VG=1.8, VD=2.4)\nMLC-{1, 2, 3, 4}: {2ms, 10ms, 40ms, 200ms} WL pulse, IDSAT threshold = {80, 60, 40, 20}uA, forward' , 135, ['fresh', 'MLC-01', 'MLC-02', 'MLC-03', 'MLC-04']) 
-    #IDS_VGS(11, 21, 36, 2, 'ULVT', 128, ['../Data/chip11/Fresh_Chip11_Col21_Ids_Vgs_VAdrain_VBsource', '../Data/chip11/MLC_Chip11_Col21_2msPULSE_VG1p8_VD2p4_Ids_Vgs_VAdrain_VBsource_01', '../Data/chip11/MLC_Chip11_Col21_10msPULSE_VG1p8_VD2p4_Ids_Vgs_VAdrain_VBsource_02', '../Data/chip11/MLC_Chip11_Col21_40msPULSE_VG1p8_VD2p4_Ids_Vgs_VAdrain_VBsource_03', '../Data/chip11/MLC_Chip11_Col21_200msPULSE_VG1p8_VD2p4_Ids_Vgs_VAdrain_VBsource_04'], ['b', 'y', 'r', 'k', 'g'], '../Plots/chip11/', 'Fresh_vs_MLC01020304_VG1p8_VD2p4_IDS-VGS_VaD-VbS_', range(0, 128), 'Fresh vs MLC-1-2-3-4 (VG=1.8, VD=2.4)\nMLC-{1, 2, 3, 4}: {2ms, 10ms, 40ms, 200ms} WL pulse, IDSAT threshold = {80, 60, 40, 20}uA, reversed', 135, ['fresh', 'MLC-01', 'MLC-02', 'MLC-03', 'MLC-04']) 
+    #IDS_VGS(14, 21, 36, 2, 'ULVT', 128, ['../Data/chip14/Fresh_Chip14_Col21_Ids_Vgs_VAsource_VBdrain', '../Data/chip14/MLC_Chip14_Col21_40msPULSE_VG1p8_VD2p4_Ids_Vgs_VAsource_VBdrain_01', '../Data/chip14/MLC_Chip14_Col21_40msPULSE_VG1p8_VD2p4_Ids_Vgs_VAsource_VBdrain_02', '../Data/chip14/MLC_Chip14_Col21_40msPULSE_VG1p8_VD2p4_Ids_Vgs_VAsource_VBdrain_03', '../Data/chip14/MLC_Chip14_Col21_40msPULSE_VG1p8_VD2p4_Ids_Vgs_VAsource_VBdrain_04'], ['b', 'y', 'r', 'k', 'g'], '../Plots/chip14/', 'Fresh_vs_MLC01020304_VG1p8_VD2p4_40msPULSE_IDS-VGS_VaS-VbD_', range(0, 128), 'Fresh vs MLC-1-2-3-4 (VG=1.8, VD=2.4)\nMLC-{1, 2, 3, 4}: all using 40ms WL pulses, IDSAT threshold = {80, 60, 40, 20}uA, forward' , 130, ['fresh', 'MLC-01', 'MLC-02', 'MLC-03', 'MLC-04']) 
+    #IDS_VGS(14, 21, 36, 2, 'ULVT', 128, ['../Data/chip14/Fresh_Chip14_Col21_Ids_Vgs_VAdrain_VBsource', '../Data/chip14/MLC_Chip14_Col21_40msPULSE_VG1p8_VD2p4_Ids_Vgs_VAdrain_VBsource_01', '../Data/chip14/MLC_Chip14_Col21_40msPULSE_VG1p8_VD2p4_Ids_Vgs_VAdrain_VBsource_02', '../Data/chip14/MLC_Chip14_Col21_40msPULSE_VG1p8_VD2p4_Ids_Vgs_VAdrain_VBsource_03', '../Data/chip14/MLC_Chip14_Col21_40msPULSE_VG1p8_VD2p4_Ids_Vgs_VAdrain_VBsource_04'], ['b', 'y', 'r', 'k', 'g'], '../Plots/chip14/', 'Fresh_vs_MLC01020304_VG1p8_VD2p4_40msPULSE_IDS-VGS_VaD-VbS_', range(0, 128), 'Fresh vs MLC-1-2-3-4 (VG=1.8, VD=2.4)\nMLC-{1, 2, 3, 4}: all using 40ms WL pulses, IDSAT threshold = {80, 60, 40, 20}uA, reversed', 130, ['fresh', 'MLC-01', 'MLC-02', 'MLC-03', 'MLC-04']) 
+    #
+    #hist_IDS_VGS(0, 14, 21, 36, 2, 'ULVT', 128, ['../Data/chip14/Fresh_Chip14_Col21_Ids_Vgs_VAdrain_VBsource', '../Data/chip14/MLC_Chip14_Col21_40msPULSE_VG1p8_VD2p4_Ids_Vgs_VAdrain_VBsource_01', '../Data/chip14/MLC_Chip14_Col21_40msPULSE_VG1p8_VD2p4_Ids_Vgs_VAdrain_VBsource_02', '../Data/chip14/MLC_Chip14_Col21_40msPULSE_VG1p8_VD2p4_Ids_Vgs_VAdrain_VBsource_03', '../Data/chip14/MLC_Chip14_Col21_40msPULSE_VG1p8_VD2p4_Ids_Vgs_VAdrain_VBsource_04'], ['b', 'y', 'r', 'k', 'g'], '../Plots/chip14/', 'Hist-IDSAT_MLC-rv1-01020304_reverse-read_', range(0, 128), 'MLC programming always using 40ms pulses, VGS=1.8, VDS=2.4 for level=1-2-3-4\nhistogram of read-IDSAT (VGS=VDS=0.8V)', 0, 130, 0, 130, 1000)
+
 
     #IDS_VGS(10, 21, 36, 2, 'ULVT', 128, ['../Data/chip10/Fresh_Chip10_Col21_Ids_Vgs_VAsource_VBdrain', '../Data/chip10/MLC_Chip10_Col21_10msPULSE_VG1p8_VD2p4_Ids_Vgs_VAsource_VBdrain_01', '../Data/chip10/MLC_Chip10_Col21_40msPULSE_VG1p8_VD2p4_Ids_Vgs_VAsource_VBdrain_02', '../Data/chip10/MLC_Chip10_Col21_200msPULSE_VG1p8_VD2p4_Ids_Vgs_VAsource_VBdrain_03'], ['b', 'y', 'r', 'k'], '../Plots/chip10/', 'Fresh_vs_MLC010203_VG1p8_VD2p4_IDS-VGS_VaS-VbD_', range(0, 128), 'Fresh vs 2-bit/4-level MLC programming (VG=1.8, VD=2.4)\nMLC-{1, 2, 3} use {10ms, 40ms, 200ms} WL pulses, IDSAT threshold = {80uA, 60uA, 40uA}, forward read' , col_list[21][4], ['fresh', 'MLC-1', 'MLC-2', 'MLC-3']) 
     #IDS_VGS(10, 21, 36, 2, 'ULVT', 128, ['../Data/chip10/Fresh_Chip10_Col21_Ids_Vgs_VAdrain_VBsource', '../Data/chip10/MLC_Chip10_Col21_10msPULSE_VG1p8_VD2p4_Ids_Vgs_VAdrain_VBsource_01', '../Data/chip10/MLC_Chip10_Col21_40msPULSE_VG1p8_VD2p4_Ids_Vgs_VAdrain_VBsource_02', '../Data/chip10/MLC_Chip10_Col21_200msPULSE_VG1p8_VD2p4_Ids_Vgs_VAdrain_VBsource_03'], ['b', 'y', 'r', 'k'], '../Plots/chip10/', 'Fresh_vs_MLC010203_VG1p8_VD2p4_IDS-VGS_VaD-VbS_', range(0, 128), 'Fresh vs 2-bit/4-level MLC programming (VG=1.8, VD=2.4)\nMLC-{1, 2, 3} use {10ms, 40ms, 200ms} WL pulses, IDSAT threshold = {80uA, 60uA, 40uA}, reversed read', col_list[21][4], ['fresh', 'MLC-1', 'MLC-2', 'MLC-3']) 

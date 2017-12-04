@@ -18,6 +18,8 @@ def hist_IDS_VGS(VG_idx, chip, col, L, Nfin, VT_flavor, Nrow, data_files, colors
 #    for direction in ['VAsource_VBdrain', 'VAdrain_VBsource']:
     fig_h, ax_h = plt.subplots(nrows = 1, ncols = 1)
     n_max = 0
+    #mean = np.zeros(len(data_files))
+    #std_dev = np.zeros(len(data_files))
     for (data_file, color) in zip(data_files, colors):
         Isense = []
         #f=open(path_data+'Fresh_Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_Ids_Vgs_'+direction,'rU')
@@ -43,18 +45,25 @@ def hist_IDS_VGS(VG_idx, chip, col, L, Nfin, VT_flavor, Nrow, data_files, colors
         #if Imin==0 or Imax==0:
         #    Imin=np.amin(1e6*IDS_VGS[row_idx, [VG_idx]*len(row_idx)])
         #    Imax=np.amax(1e6*IDS_VGS[row_idx, [VG_idx]*len(row_idx)])
-        n, bins, pathes = ax_h.hist(1e6*IDS_VGS[row_idx, [VG_idx]*len(row_idx)], bins=Num_bins, normed = False, range=(Imin, Imax), orientation = 'horizontal', color = color, edgecolor='none')
+        n, bins, patches = ax_h.hist(1e6*IDS_VGS[row_idx, [VG_idx]*len(row_idx)], bins=Num_bins, normed = False, range=(Imin, Imax), orientation = 'horizontal', color = color, edgecolor='none')
+        mean = np.mean(1e6*IDS_VGS[row_idx, [VG_idx]*len(row_idx)])
+        std_dev = np.std(1e6*IDS_VGS[row_idx, [VG_idx]*len(row_idx)])
+        print(mean, std_dev)
+        plt.text(np.amax(n), mean+5, 'mean='+str(mean)+'\nstd_dev='+str(std_dev), horizontalalignment='left', fontsize=7)
+        
         if np.amax(n) > n_max:
             n_max = np.amax(n)
     print(n_max)
-    #ax.set_xlim(0, n_max*4)
+    #ax_h.set_xlim(0, n_max*4)
     ax_h.set_ylim(Ymin, Ymax)
     ax_h.grid(True)
+    #plt.yticks([],[])
     plt.xlabel('number of cells')
     plt.title('L='+str(L)+', Nfin='+str(Nfin)+', '+VT_flavor+', #'+str(Nrow)+'cells\n'+title, fontsize=7)
     plt.savefig(path_plot+plot_file+'Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_horizontal.pdf')
     plt.close()
 
+    """
     fig_v, ax_v = plt.subplots(nrows = 1, ncols = 1)
     n_max = 0
     for (data_file, color) in zip(data_files, colors):
@@ -88,6 +97,7 @@ def hist_IDS_VGS(VG_idx, chip, col, L, Nfin, VT_flavor, Nrow, data_files, colors
     plt.title('L='+str(L)+', Nfin='+str(Nfin)+', '+VT_flavor+', #'+str(Nrow)+'cells\n'+title, fontsize=7)
     plt.savefig(path_plot+plot_file+'Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_vertical.pdf')
     plt.close()
+    """
 
 def IDS_VGS(chip, col, L, Nfin, VT_flavor, Nrow, data_files, colors, path_plot, plot_file, row_idx, title, Ymax, IV_group_legend = [], VD = 0.8, VG_min = 0.2, VG_max = 0.8):
 

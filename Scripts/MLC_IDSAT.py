@@ -7,6 +7,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from scipy.interpolate import interp1d
+from scipy.optimize import curve_fit
+
+def log_shift_I0(x, a, r):
+    return -a*np.log(1 + r*x)
+
+def log_shift(x, b, a, r):
+    return b - a*np.log(1 + r*x)
+
+def exp_shift(x, a, b, c):
+    return a * np.exp(-b*x) + c
+
+def power_shift(x, b, a, n):
+    return b - a * x**n
 
 def MLC_IDSAT_characterization(chip, col, L, Nfin, VT_flavor, VG, VD, Nrow, row_idx, 
         write_time, pulse_length, PulseCycle,  
@@ -261,15 +274,20 @@ def MLC_IDSAT_algorithm_naivete(chip, col, L, Nfin, VT_flavor, VG, VD, Nrow, row
                     IDSAT[row][start_idx+1+pulse*(1+1+1): start_idx+1+pulse*(1+1+1)+2] = np.float64(IDSAT_all[0][Nrow+pulse*(Nrow*(1+1+1))+row*(1+1): Nrow+pulse*(Nrow*(1+1+1))+row*(1+1)+2])
                     IDSAT[row][start_idx+1+pulse*(1+1+1)+2] = np.float64(IDSAT_all[0][Nrow+pulse*(Nrow*(1+1+1))+Nrow*(1+1)+row])
         
-        """
+        
         #if (Imin < 0.01) and (Imax < 0.01):
             Imin = 1e6*np.amin(IDSAT[row_idx])
             Imax = 1e6*np.amax(IDSAT[row_idx])
 
+        """
         plt.title('L='+str(L)+', Nfin='+str(Nfin)+', '+VT_flavor+'\n, naive 2-bit MLC, IDSAT evolution, VGS='+str(VG)+'V, VDS='+str(VD)+'V\nIDSAT measured at VGS=0.8, VDS=0.8, '+meas_dir+' direction', fontsize=10)
+        """
         Tstress_accum = 0
         data_points = 0
         pulse_idx = 0
+        if(meas_dir == 'reversed'):
+            last_IDSAT_above_threshold = np.zeros((PulseCycle, Nrow))
+            delta_IDSAT_cross_threshold = np.zeros((PulseCycle, Nrow))
         for cycle in np.arange(PulseCycle):
 
             row_axe=[]
@@ -281,23 +299,54 @@ def MLC_IDSAT_algorithm_naivete(chip, col, L, Nfin, VT_flavor, VG, VD, Nrow, row
                 else:
                     row_marker = '.'
 
+                """
                 axe, = plt.plot([cycle*0.1+Tstress_accum], 1e6*IDSAT[row][data_points], color='b', marker = row_marker)
+                """
                 if(len(row_idx) == len(marker_lst)):
                     row_axe.append(axe)
                 
                 for pulse in np.arange(pulse_idx, pulse_idx+write_time[cycle]): 
                     if (Apply_Pulse[row][pulse] == 1):
                         seg_color = 'r'
+                        if(meas_dir == 'reversed'):
+                            if (pulse_idx+write_time[cycle] == pulse+1):
+                                last_IDSAT_above_threshold[cycle][row] = 1e6*IDSAT[row][data_points+1+(pulse-pulse_idx)*(1+1+1)]
+                                delta_IDSAT_cross_threshold[cycle][row] = 1e6*IDSAT[row][data_points+1+(pulse-pulse_idx)*(1+1+1)] - 1e6*IDSAT[row][data_points+1+(pulse-pulse_idx)*(1+1+1)+1]
+                            elif (Apply_Pulse[row][pulse+1] == 0): 
+                                last_IDSAT_above_threshold[cycle][row] = 1e6*IDSAT[row][data_points+1+(pulse-pulse_idx)*(1+1+1)]
+                                delta_IDSAT_cross_threshold[cycle][row] = 1e6*IDSAT[row][data_points+1+(pulse-pulse_idx)*(1+1+1)] - 1e6*IDSAT[row][data_points+1+(pulse-pulse_idx)*(1+1+1)+1]
                     if (Apply_Pulse[row][pulse] == 0):
                         seg_color = 'b'
+                    """
                     plt.plot(cycle*0.1+Tstress_accum+(pulse-pulse_idx)*pulse_length[cycle] + np.array([0, pulse_length[cycle]/(1.0+1.0+1.0)]), 1e6*IDSAT[row][data_points+1+(pulse-pulse_idx)*(1+1+1)-1: data_points+1+(pulse-pulse_idx)*(1+1+1)+1], color=seg_color, linestyle='solid', linewidth = 0.4, alpha = 0.5)
                     plt.plot(cycle*0.1+Tstress_accum+(pulse-pulse_idx)*pulse_length[cycle] + np.arange(pulse_length[cycle]/(1.0+1.0+1.0), 2*pulse_length[cycle]/(1.0+1.0+1.0)+0.0001, pulse_length[cycle]/(1.0+1.0+1.0)), 1e6*IDSAT[row][data_points+1+(pulse-pulse_idx)*(1+1+1): data_points+1+(pulse-pulse_idx+1)*(1+1+1)-1], color=seg_color, linestyle='solid', marker=row_marker, linewidth = 0.4, markersize=2)
                     plt.plot(cycle*0.1+Tstress_accum+(pulse-pulse_idx)*pulse_length[cycle] + np.arange(2*pulse_length[cycle]/(1.0+1.0+1.0), pulse_length[cycle]+0.0001, pulse_length[cycle]/(1.0+1.0+1.0)), 1e6*IDSAT[row][data_points+1+(pulse-pulse_idx)*(1+1+1)+1: data_points+1+(pulse-pulse_idx+1)*(1+1+1)], color=seg_color, linestyle='solid', linewidth = 0.4, alpha = 0.5)
+                    """
 
             Tstress_accum += write_time[cycle]*pulse_length[cycle]
             data_points += 1+write_time[cycle]*(1+1+1)
             pulse_idx += write_time[cycle]
 
+            if(meas_dir == 'reversed'):
+                print(last_IDSAT_above_threshold[cycle])
+                fig, ax = plt.subplots(nrows = 1, ncols = 1)
+                n, bins, patches = ax.hist(last_IDSAT_above_threshold[cycle], bins=40, normed = False)
+                plt.ylabel('number of cells')
+                plt.xlabel('last IDSAT before crossing threshold (uA)')
+                plt.title('level-'+str(cycle+1)+', last IDSAT before crossing threshold (uA)', fontsize=8)
+                plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_level'+str(cycle+1)+'_last_IDSAT_above_threshold.pdf')
+                plt.close()
+
+                print(delta_IDSAT_cross_threshold[cycle])
+                fig, ax = plt.subplots(nrows = 1, ncols = 1)
+                n, bins, patches = ax.hist(delta_IDSAT_cross_threshold[cycle], bins=40, normed = False)
+                plt.ylabel('number of cells')
+                plt.xlabel('delta IDSAT when crossing the threshold (uA)')
+                plt.title('level-'+str(cycle+1)+', delta IDSAT during the pulse when crossing threshold (uA)', fontsize=8)
+                plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_level'+str(cycle+1)+'_delta_IDSAT_cross_threshold.pdf')
+                plt.close()
+
+        """
         #plt.xticks(t, t_label, rotation=30, fontsize=9)
         plt.xticks(t, t_label, fontsize = 5)
         plt.ylim(Imin, Imax)
@@ -314,7 +363,9 @@ def MLC_IDSAT_algorithm_naivete(chip, col, L, Nfin, VT_flavor, VG, VD, Nrow, row
         plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_'+VGVD_char+'_'+meas_dir+title+'.pdf')
         #plt.savefig(path_plot+'IDSAT_'+str(figN).zfill(3)+'_Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_'+meas_dir+'.pdf')
         plt.close()
+        """
 
+    """
     if(Nrow == len(row_idx)):
         plt.title('L='+str(L)+', Nfin='+str(Nfin)+', '+VT_flavor+'\nnaive 2-bit MLC, Rows_remain vs pulse, VGS='+str(VG)+'V, VDS='+str(VD)+'V', fontsize=10)
         pulse_idx = 0
@@ -340,6 +391,8 @@ def MLC_IDSAT_algorithm_naivete(chip, col, L, Nfin, VT_flavor, VG, VD, Nrow, row
         #plt.savefig(path_plot+'IDSAT_'+str(figN).zfill(3)+'_Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_'+meas_dir+'.pdf')
         plt.close()
         """
+
+    """
     print(N_pulse)
     print(np.corrcoef(N_pulse, rowvar=False))
     print(np.cov(N_pulse, rowvar=False))
@@ -352,6 +405,7 @@ def MLC_IDSAT_algorithm_naivete(chip, col, L, Nfin, VT_flavor, VG, VD, Nrow, row
             plt.title('Number of pulse applied to each of the '+str(Nrow)+' cells, to program level '+str(j+1)+' vs level '+str(i+1))
             plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_'+VGVD_char+'_Npulse_level_'+str(j+1)+'_vs_'+str(i+1)+'.pdf')
             plt.close()
+            """
 
 
 def MLC_IDSAT_algorithm_rv1(chip, col, L, Nfin, VT_flavor, VG, VD, Nrow, row_idx, 
@@ -440,6 +494,22 @@ def MLC_IDSAT_algorithm_rv1(chip, col, L, Nfin, VT_flavor, VG, VD, Nrow, row_idx
 
         IDSAT = np.zeros((Nrow, data_points)) 
 
+        # for concatenating real stressing pulses, customized for each row: list can hold variable length arrays:)
+        IDSAT_stressed = []
+        stress_times = []
+        for row in np.arange(0, Nrow):
+            IDSAT_stressed.append(np.zeros(int(np.sum(N_pulse[row])+PulseCycle)))
+            stress_times.append(np.arange(0, pulse_length[0]*N_pulse[row][0]+0.0001, pulse_length[0]))
+            if PulseCycle > 1:
+                t_accum = pulse_length[0]*N_pulse[row][0]
+                for cycle in np.arange(1, PulseCycle):
+                    stress_times[row] = np.append(stress_times[row], np.arange(t_accum, t_accum + pulse_length[cycle]*N_pulse[row][cycle]+0.0001, pulse_length[cycle]))
+                    t_accum += pulse_length[cycle]*N_pulse[row][cycle]
+        # for concatenating real stressing pulses
+                    
+
+
+
         # Procedure: "ALL_Initial_IDSAT_", then {[cell-by-cell: ('Before_*PULSE_IDSAT_' + 'Stress_*PULSE_IDSAT_'), then "ALL_Recovered_*PULSE_IDSAT_"] x "total pulse cycles"}
         for cycle in np.arange(0, PulseCycle):
             IDSAT_all = []
@@ -464,14 +534,63 @@ def MLC_IDSAT_algorithm_rv1(chip, col, L, Nfin, VT_flavor, VG, VD, Nrow, row_idx
                     IDSAT[row][start_idx+1+pulse*(1+1+1): start_idx+1+pulse*(1+1+1)+2] = np.float64(IDSAT_all[0][Nrow+pulse*(Nrow*(1+1+1))+row*(1+1): Nrow+pulse*(Nrow*(1+1+1))+row*(1+1)+2])
                     IDSAT[row][start_idx+1+pulse*(1+1+1)+2] = np.float64(IDSAT_all[0][Nrow+pulse*(Nrow*(1+1+1))+Nrow*(1+1)+row])
         
-        #if (Imin < 0.01) and (Imax < 0.01):
-            Imin = 1e6*np.amin(IDSAT[row_idx])
-            Imax = 1e6*np.amax(IDSAT[row_idx])
+            for row in np.arange(0, Nrow):
+                stress_idx = 0
+                for c in np.arange(cycle):
+                    stress_idx += 1 + N_pulse[row][c]
+                IDSAT_stressed[row][int(stress_idx): int(stress_idx + N_pulse[row][cycle] + 1)] = IDSAT[row][start_idx : int(start_idx + 3*N_pulse[row][cycle] + 1): 3]
 
+        ##if (Imin < 0.01) and (Imax < 0.01):
+        #    Imin = 1e6*np.amin(IDSAT[row_idx])
+        #    Imax = 1e6*np.amax(IDSAT[row_idx])
+        
         plt.title('L='+str(L)+', Nfin='+str(Nfin)+', '+VT_flavor+'\n, rv1 2-bit MLC, IDSAT evolution, VGS='+str(VG)+'V, VDS='+str(VD)+'V\nIDSAT measured at VGS=0.8, VDS=0.8, '+meas_dir+' direction', fontsize=10)
+
+        for row in row_idx:
+            #popt, pcov = curve_fit(log_shift, xdata, ydata, bounds=([0, 8, 0], [np.inf, 12, np.inf]))
+            #popt, pcov = curve_fit(log_shift, xdata, ydata, bounds=(-np.inf, np.inf))
+            popt, pcov = curve_fit(log_shift_I0, stress_times[row], 1e6*(IDSAT_stressed[row] -IDSAT_stressed[row][0]) , bounds=(0, np.inf))
+            rmse = np.mean((1e6*(IDSAT_stressed[row]-IDSAT_stressed[row][0]) - log_shift_I0(stress_times[row], *popt))**2)**0.5
+            #popt, pcov = curve_fit(log_shift, stress_times[row], 1e6*IDSAT_stressed[row], bounds=(0, np.inf))
+            #rmse = np.mean((1e6*IDSAT_stressed[row] - log_shift(stress_times[row], *popt))**2)**0.5
+            #plt.plot(stress_times[row], log_shift(stress_times[row], *popt) - log_shift(stress_times[row][0], *popt) , linewidth=0.4, color='g')
+            #plt.plot(stress_times[row], 1e6*(IDSAT_stressed[row] - IDSAT_stressed[row][0]), marker = '.', markersize=2, linewidth=0.4, color='r')
+            plot_times = stress_times[row]
+            plot_times[0] = 0.0001  # use 0.1ms as the time of the first (fresh) current in order for it to show up in the log-plot (approximation error?)
+            #plt.plot(plot_times, log_shift(stress_times[row], *popt), linewidth=0.4, color='g')
+            #plt.plot(plot_times, 1e6*IDSAT_stressed[row], marker = '.', markersize=2, linewidth=0.4, color='r')
+            plt.plot(plot_times, 1e6*IDSAT_stressed[row][0] + log_shift_I0(stress_times[row], *popt), linewidth=0.4, color='g')
+            plt.plot(plot_times, 1e6*IDSAT_stressed[row], marker = '.', markersize=2, linewidth=0.4, color='r')
+            #plt.plot(stress_times[row], log_shift(stress_times[row], *popt), linewidth=0.4, color='g')
+            #plt.plot(stress_times[row], 1e6*IDSAT_stressed[row], marker = '.', markersize=2, linewidth=0.4, color='r')
+            print(row, rmse, popt, 1e6*IDSAT_stressed[row][0], stress_times[row][-1])
+            if len(row_idx) == 1:
+                plt.xlabel('real stressing time (sec) of row_'+str(row)+'\nrmse='+str(rmse)+'uA, y = '+str(1e6*IDSAT_stressed[row][0])+' - '+str(popt[0])+' * log(1 + '+str(popt[1])+' * x)', fontsize=7)
+                #plt.xlabel('real stressing time (sec) of row_'+str(row)+'\nrmse='+str(rmse)+'uA, y = '+str(popt[0])+' - '+str(popt[1])+' * log(1 + '+str(popt[2])+' * x)', fontsize=7)
+
+        if (Imin > 0.01) and (Imax > 0.01):
+            plt.ylim(Imin, Imax)
+        plt.grid()
+        plt.ylabel('IDSAT (uA)')
+
+        plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_'+VGVD_char+'_'+meas_dir+title+'_log-fit_multi-level-stressing.pdf')
+        #plt.ylabel('delta_I = I(t_stress) - I(t=0,fresh)')
+        #plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_'+VGVD_char+'_'+meas_dir+title+'_delta-I_log-fit_multi-level-stressing.pdf')
+        plt.xscale('log')
+        plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_'+VGVD_char+'_'+meas_dir+title+'_LogTime_log-fit_multi-level-stressing.pdf')
+        #plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_'+VGVD_char+'_'+meas_dir+title+'_delta-I_LogTime_log-fit_multi-level-stressing.pdf')
+        plt.close()
+        """
+
+        
+    """
         Tstress_accum = 0
         data_points = 0
         pulse_idx = 0
+        if(meas_dir == 'reversed'):
+            last_IDSAT_above_threshold_round1 = np.zeros((PulseCycle, Nrow))
+            delta_IDSAT_cross_threshold_round1 = np.zeros((PulseCycle, Nrow))
+
         for cycle in np.arange(PulseCycle):
 
             row_axe=[]
@@ -483,28 +602,88 @@ def MLC_IDSAT_algorithm_rv1(chip, col, L, Nfin, VT_flavor, VG, VD, Nrow, row_idx
                 else:
                     row_marker = '.'
 
+                
+                #careful: this only works for the first level cycle
+                xdata = np.arange(0, N_pulse[row][cycle]*pulse_length[cycle]+0.0001, pulse_length[cycle])
+                ydata = 1e6*IDSAT[row][data_points: int(data_points+3*N_pulse[row][cycle]+1): 3]
+
+                #popt, pcov = curve_fit(log_shift, xdata, ydata, bounds=([0, 8, 0], [np.inf, 12, np.inf]))
+                popt, pcov = curve_fit(log_shift, xdata, ydata, bounds=(-np.inf, np.inf))
+                #popt, pcov = curve_fit(log_shift, xdata, ydata, bounds=(0, np.inf))
+                rmse = np.mean((ydata - log_shift(xdata, *popt))**2)**0.5
+                plt.plot(xdata, log_shift(xdata, *popt), marker = row_marker, markersize=2, linewidth=0.4, color='g')
+                print(row, rmse, popt)
+                plt.text(0.3, 90, 'rmse='+str(rmse)+'uA\ny = '+str(popt[0])+' - '+str(popt[1])+' * log(1 + '+str(popt[2])+' * x)', fontsize=9)
+
+                #popt, pcov = curve_fit(exp_shift, xdata, ydata)
+                #rmse = np.mean((ydata - exp_shift(xdata, *popt))**2)**0.5
+                #print(row, rmse)
+                #plt.plot(xdata, exp_shift(xdata, *popt), marker = row_marker, markersize=2, linewidth=0.4, color='g')
+
+                #popt, pcov = curve_fit(power_shift, xdata, ydata, bounds=(0, [np.inf, np.inf, 1.]))
+                #plt.plot(xdata, power_shift(xdata, *popt), marker = row_marker, markersize=2, linewidth=0.4, color='g')
+                #rmse = np.mean((ydata - power_shift(xdata, *popt))**2)**0.5
+                #print(row, rmse, popt)
+                #plt.text(0.08, 105, 'rmse='+str(rmse)+'uA\ny = '+str(popt[0])+' - '+str(popt[1])+' * x ** '+str(popt[2]), fontsize=9)
+                #careful: this only works for the first level cycle
+                
+
                 axe, = plt.plot([cycle*0.1+Tstress_accum], 1e6*IDSAT[row][data_points], color='b', marker = row_marker)
+                
                 if(len(row_idx) == len(marker_lst)):
                     row_axe.append(axe)
                 
                 for pulse in np.arange(pulse_idx, pulse_idx+write_time[cycle]): 
                     if ((round_idx[row][pulse] == 1) and (Next_Pulse[row][pulse] == 1)):
                         seg_color = 'r'
+
+                        #CAUTIOUS: not carefully considering corner cases! Doesn't work for the slowest cell if round2 is skipped!!!(chip14)
+                        if ((meas_dir == 'reversed') and (Next_Pulse[row][pulse+1] == 0)):
+                            last_IDSAT_above_threshold_round1[cycle][row] = 1e6*IDSAT[row][data_points+1+(pulse-pulse_idx)*(1+1+1)-1]
+                            delta_IDSAT_cross_threshold_round1[cycle][row] = -1e6*IDSAT[row][data_points+1+(pulse-pulse_idx+1)*(1+1+1)-1] + 1e6*IDSAT[row][data_points+1+(pulse-pulse_idx)*(1+1+1)-1] 
+
                     if (((round_idx[row][pulse] == 1) and (Next_Pulse[row][pulse] == 0)) or ((round_idx[row][pulse] == 2) and (Next_pulse_round2[row][pulse] == 0))):
                         seg_color = 'b'
                     if ((round_idx[row][pulse] == 2) and (Next_pulse_round2[row][pulse] == 1)):
                         seg_color = 'y'
+                    
                     plt.plot(cycle*0.1+Tstress_accum+(pulse-pulse_idx)*pulse_length[cycle] + np.array([0, pulse_length[cycle]/(1.0+1.0+1.0)]), 1e6*IDSAT[row][data_points+1+(pulse-pulse_idx)*(1+1+1)-1: data_points+1+(pulse-pulse_idx)*(1+1+1)+1], color=seg_color, linestyle='solid', linewidth = 0.4, alpha = 0.5)
                     plt.plot(cycle*0.1+Tstress_accum+(pulse-pulse_idx)*pulse_length[cycle] + np.arange(pulse_length[cycle]/(1.0+1.0+1.0), 2*pulse_length[cycle]/(1.0+1.0+1.0)+0.0001, pulse_length[cycle]/(1.0+1.0+1.0)), 1e6*IDSAT[row][data_points+1+(pulse-pulse_idx)*(1+1+1): data_points+1+(pulse-pulse_idx+1)*(1+1+1)-1], color=seg_color, linestyle='solid', marker=row_marker, linewidth = 0.4, markersize=2)
                     plt.plot(cycle*0.1+Tstress_accum+(pulse-pulse_idx)*pulse_length[cycle] + np.arange(2*pulse_length[cycle]/(1.0+1.0+1.0), pulse_length[cycle]+0.0001, pulse_length[cycle]/(1.0+1.0+1.0)), 1e6*IDSAT[row][data_points+1+(pulse-pulse_idx)*(1+1+1)+1: data_points+1+(pulse-pulse_idx+1)*(1+1+1)], color=seg_color, linestyle='solid', linewidth = 0.4, alpha = 0.5)
+                    
 
             Tstress_accum += write_time[cycle]*pulse_length[cycle]
             data_points += 1+write_time[cycle]*(1+1+1)
             pulse_idx += write_time[cycle]
+            """
 
+    """
+            if(meas_dir == 'reversed'):
+                print(last_IDSAT_above_threshold_round1[cycle])
+                fig, ax = plt.subplots(nrows = 1, ncols = 1)
+                n, bins, patches = ax.hist(last_IDSAT_above_threshold_round1[cycle], bins=40, normed = False)
+                plt.ylabel('number of cells')
+                plt.xlabel('last IDSAT before crossing threshold (uA)')
+                plt.title('level-'+str(cycle+1)+', last IDSAT before crossing threshold (uA)', fontsize=8)
+                plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_level'+str(cycle+1)+'_last_IDSAT_above_threshold.pdf')
+                plt.close()
+
+                print(delta_IDSAT_cross_threshold_round1[cycle])
+                fig, ax = plt.subplots(nrows = 1, ncols = 1)
+                n, bins, patches = ax.hist(delta_IDSAT_cross_threshold_round1[cycle], bins=40, normed = False)
+                plt.ylabel('number of cells')
+                plt.xlabel('delta IDSAT when crossing the threshold (uA)')
+                plt.title('level-'+str(cycle+1)+', delta IDSAT during the pulse when crossing threshold (uA)', fontsize=8)
+                plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_level'+str(cycle+1)+'_delta_IDSAT_cross_threshold.pdf')
+                plt.close()
+                """
+
+        
+    """
         #plt.xticks(t, t_label, rotation=30, fontsize=9)
         #plt.xticks(t, t_label, fontsize = 5)
-        plt.ylim(Imin, Imax)
+        if (Imin > 0.01) and (Imax > 0.01):
+            plt.ylim(Imin, Imax)
         if(t_range == []):
             plt.xlim(0, Tstress_accum+0.1*(PulseCycle-1))
         else:
@@ -517,11 +696,19 @@ def MLC_IDSAT_algorithm_rv1(chip, col, L, Nfin, VT_flavor, VG, VD, Nrow, row_idx
         if(len(row_idx) == len(marker_lst)):
             plt.legend(row_axe, [str(row_num) for row_num in row_idx], loc='best', fontsize = 7, numpoints = 1)
                 
-        #plt.subplots_adjust(bottom=0.15)
+        ##plt.subplots_adjust(bottom=0.15)
         plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_'+VGVD_char+'_'+meas_dir+title+'.pdf')
-        #plt.savefig(path_plot+'IDSAT_'+str(figN).zfill(3)+'_Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_'+meas_dir+'.pdf')
+        #plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_'+VGVD_char+'_'+meas_dir+title+'_curve_fit_log.pdf')
+        #plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_'+VGVD_char+'_'+meas_dir+title+'_curve_fit_log_bounded.pdf')
+        #plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_'+VGVD_char+'_'+meas_dir+title+'_curve_fit_power.pdf')
+        #plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_'+VGVD_char+'_'+meas_dir+title+'_curve_fit_exp.pdf')
+        ##plt.savefig(path_plot+'IDSAT_'+str(figN).zfill(3)+'_Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_'+meas_dir+'.pdf')
         plt.close()
+        """
+        
 
+
+    """
     if(Nrow == len(row_idx)):
         plt.title('L='+str(L)+', Nfin='+str(Nfin)+', '+VT_flavor+'\nrv1 2-bit MLC, Rows_remain & Rows_remain_round2 vs pulse, VGS='+str(VG)+'V, VDS='+str(VD)+'V', fontsize=10)
         pulse_idx = 0
