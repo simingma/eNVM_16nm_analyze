@@ -21,6 +21,99 @@ def exp_shift(x, a, b, c):
 def power_shift(x, b, a, n):
     return b - a * x**n
 
+def multi_col_MLC_IDSAT_characterization(chip, col_col, L, Nfin, VT_flavor, VG, VD, Nrow, col_row_idx, 
+        write_time, pulse_length, PulseCycle,  
+        t, t_label,
+        col_data_files, colors, path_plot, VGVD_char, title, Imin=0, Imax=0):
+
+    """ modified from MLC_IDSAT_characterization to compare multiple columns """
+
+# missing: it's more rigorous to extract OFF_leakages data and subtracted
+
+    if os.path.isdir(path_plot) == False:
+        os.mkdir(path_plot)
+
+    #plt.figure(figsize=(12, 12))
+    legend = []
+    for (col, row_idx, data_files, color) in zip(col_col, col_row_idx, col_data_files, colors):
+        #for (meas_dir, direction) in [('reversed', 'VAdrain_VBsource'), ('forward', 'VAsource_VBdrain')]:
+        for (meas_dir, direction) in [('reversed', 'VAdrain_VBsource')]:
+            data_points = 0
+            for cycle in np.arange(PulseCycle):
+                data_points += 1+1+write_time[cycle]+1
+
+            I_mean = np.zeros((1 + data_points - 3*PulseCycle))
+            IDSAT = np.zeros((Nrow, data_points)) 
+            #initially all IDSAT, then cell-by-cell 'fresh'+stressing IDSAT, finally recovery all IDSAT
+            for cycle in np.arange(0, PulseCycle):
+                IDSAT_all = []
+                # Only one file: I always stress in VAsource_VBdrain direction, 
+                # and measurements in both directions are all in this one file
+                f = open(data_files[cycle],'rU')
+                IDSAT_all.append(re.findall(r'_IDSAT_WL\[\d+\]_'+direction+'=(-*\d*\.\d+)',f.read()))
+                f.close()
+
+                if (len(IDSAT_all[0]) != Nrow*(1+1+write_time[cycle]+1)):
+                    print('data file error!\ngrabed '+str(len(IDSAT_all[0]))+' IDSAT,\nbut expecting '+str(Nrow*(1+1+write_time[cycle]+1))+' data\n')
+
+                start_idx = 0
+                for c in np.arange(cycle):
+                    start_idx += 1+1+write_time[c]+1
+
+                for row in np.arange(0, Nrow):
+                    IDSAT[row][start_idx] = np.float64(IDSAT_all[0][row])
+                    IDSAT[row][start_idx+1: (start_idx + 1+1+write_time[cycle]+1)-1] = np.float64(IDSAT_all[0][Nrow+row*(1+write_time[cycle]): Nrow+(row+1)*(1+write_time[cycle])])
+                    IDSAT[row][(start_idx + 1+1+write_time[cycle]+1)-1] = np.float64(IDSAT_all[0][Nrow+Nrow*(1+write_time[cycle])+row])
+            
+            if (Imin < 0.01) and (Imax < 0.01):
+                Imin = 1e6*np.amin(IDSAT[row_idx])
+                Imax = 1e6*np.amax(IDSAT[row_idx])
+
+            #plt.title('L='+str(L)+', Nfin='+str(Nfin)+', '+VT_flavor+'\nIDSAT vs stress time, VGS='+str(VG)+'V, VDS='+str(VD)+'V\nIDSAT measured at VGS=0.8, VDS=0.8, '+meas_dir+' direction', fontsize=10)
+            Tstress_accum = 0
+            data_points = 0
+            for cycle in np.arange(PulseCycle):
+                if cycle == 0:
+                    time_points = np.array([0])
+                    I_mean[0] = 1e6 * np.mean(IDSAT[row_idx, 1])
+                time_points = np.append(time_points, np.arange(Tstress_accum+pulse_length[cycle], Tstress_accum+write_time[cycle]*pulse_length[cycle]+0.0001, pulse_length[cycle]))
+                I_mean[data_points+1 - 3*cycle : data_points+1 - 3*cycle + write_time[cycle]] = 1e6*np.mean(IDSAT[row_idx, data_points+2: data_points+(1+1+write_time[cycle]+1)-1], axis = 0)
+
+                #plt.plot(np.arange(Tstress_accum+pulse_length[cycle], Tstress_accum+write_time[cycle]*pulse_length[cycle]+0.0001, pulse_length[cycle]), 1e6*IDSAT[row][data_points+2: data_points+(1+1+write_time[cycle]+1)-1], color=color, linestyle='solid', marker='.')
+                #for row in row_idx:
+                    #plt.plot(cycle*0.4+np.append(np.arange(Tstress_accum-pulse_length[cycle], Tstress_accum+write_time[cycle]*pulse_length[cycle]+0.0001, pulse_length[cycle]), np.array([Tstress_accum+write_time[cycle]*pulse_length[cycle]+0.1])), 1e6*IDSAT[row][data_points: data_points+(1+1+write_time[cycle]+1)], color=color, linestyle='solid', marker='.')
+
+                Tstress_accum += write_time[cycle]*pulse_length[cycle]
+                data_points += 1+1+write_time[cycle]+1
+            axe, = plt.plot(time_points, I_mean-I_mean[0], color = color[1], marker = color[2], markersize=9, alpha=1.0, linestyle = 'None')
+            legend.append(axe)
+            popt, pcov = curve_fit(log_shift_I0, time_points, I_mean-I_mean[0], bounds=(0, np.inf))
+            plt.plot(time_points, log_shift_I0(time_points, *popt), linewidth=2.4, color=color[0])
+            print(popt)
+            print(1/popt[0], popt[0]*popt[1])
+
+    #plt.xticks(t, t_label, rotation=30, fontsize=9)
+    #plt.xticks(t, t_l=abel)
+    #plt.ylim(0, 165)
+    plt.ylim(-100, 0)
+    #plt.xlim(-pulse_length[0], t[-1]+0.1)
+    plt.xticks([0.5, 1.5, 2.5, 3.5], ['0.5', '1.5', '2.5', '3.5'], fontsize=17)
+    plt.yticks([-100, -80, -60, -40, -20, 0], ['-100', '-80', '-60', '-40', '-20', '0'], fontsize=17)
+    #plt.grid()
+    #plt.legend([HCI_fig, PBTI_fig], ['HCI', 'PBTI: VDS=0'], loc = 'best')
+    plt.xlabel('time (sec)', fontsize=17)
+    plt.ylabel('IDSAT (uA)', fontsize=17)
+    VGVD_char = ['$\mathrm{L=36nm, V_{DS}=2.0V}$', '$\mathrm{L=36nm, V_{DS}=2.4V}$', '$\mathrm{L=16nm, V_{DS}=1.7V}$', '$\mathrm{L=16nm, V_{DS}=2.0V}$']
+    plt.legend(legend, VGVD_char, fontsize=17)
+    #plt.subplots_adjust(bottom=0.15)
+    plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col-compare_'+'VGVD-compare_I-shift'+meas_dir+title+'_log-curve-fit.pdf')
+    #plt.xscale('log')
+    #plt.show()
+    #plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col-compare_'+'VGVD-compare_I-shift'+meas_dir+title+'_logTime_log-curve-fit.pdf')
+    #plt.savefig(path_plot+'IDSAT_'+str(figN).zfill(3)+'_Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_'+meas_dir+'.pdf')
+    plt.close()
+
+
 def MLC_IDSAT_characterization(chip, col, L, Nfin, VT_flavor, VG, VD, Nrow, row_idx, 
         write_time, pulse_length, PulseCycle,  
         t, t_label,

@@ -12,14 +12,69 @@ from I_V_curves import hist_IDS_VGS, IDS_VGS_stress, IDS_VGS, IDSAT_vs_row
 from VG_ConstPulse_horizontal_hist import IDSAT_horizontal_hist
 from VG_ConstPulse_separation import IDSAT_separation
 from Charge_Pumping import Charge_Pumping, Charge_Pumping_compare
-from MLC_IDSAT import MLC_IDSAT_characterization, MLC_IDSAT_algorithm_naivete, MLC_IDSAT_algorithm_rv1
+from MLC_IDSAT import *
+from Marcov_Chain import *
+from mpl_toolkits.mplot3d import Axes3D
+import scipy.linalg as sp_lin
 
 def main():
     
+    """
+    Istep = 0.5
+    Imax = 160.0
+    Ith = np.array([90.0, 70.0, 50.0, 30.0])
+    Tpulse = np.array([0.002, 0.01, 0.04, 0.2])
+    Imin = 0.0
+    N_state_total = int(round((Imax - Imin)/Istep) + 1)
+    k_inv = 15.489
+    b0 = 21207.8
+    #d0 = 80000.0
+    #r = -1.5
+    #generator = death_birth_generator_matrix(1/k_inv, b0, d0, r, N_state_total, Istep)
+
+    generator = Testing_death_birth_generator_matrix(1/k_inv, b0, 4000.0, N_state_total, Istep)
+
+    Prior = Gaussian_function(np.arange(N_state_total), IDSAT_to_state(126.641, Imax=160.0, Istep=Istep), 7.039/Istep)
+    relaxation = Gaussian_function(np.arange(N_state_total), IDSAT_to_state(1.35, Imax=160.0, Istep=Istep), 0.95/Istep)
+    for cycle in np.arange(4):
+        N_state_transient = int(round((Imax - Ith[cycle])/Istep) + 1)
+        T_mat, P_mat = transition_matrix(generator, Tpulse[cycle], N_state_total, N_state_transient) 
+        Final_mat = np.linalg.matrix_power(P_mat, 1024)
+        Prior = np.matmul(Prior, Final_mat)
+        Prior_mean = 0
+        Prior_std = 0
+        for i in np.arange(N_state_total):
+            Prior_mean += (Imax - Istep*i) * Prior[i]
+        for i in np.arange(N_state_total):
+            Prior_std += (Imax - Istep*i - Prior_mean)**2 * Prior[i]
+        Prior_std = np.sqrt(Prior_std)
+        print('level ', cycle+1, 'mean and std')
+        print('before relax', Prior_mean, Prior_std)
+        convolve_relax = np.convolve(Prior, relaxation)
+        convolve_relax = convolve_relax[-N_state_total:]
+        #relax_mean = Imax - Istep * np.average(np.arange(N_state_total), weights = convolve_relax)
+        #print(relax_mean)
+        relax_mean = 0
+        relax_std = 0
+        for i in np.arange(N_state_total):
+            relax_mean += (Imax - Istep*i) * convolve_relax[i]
+        for i in np.arange(N_state_total):
+            relax_std += (Imax - Istep*i - relax_mean)**2 * convolve_relax[i]
+        relax_std = np.sqrt(relax_std)
+        print('after relax', relax_mean, relax_std)
+        plt.figure(cycle+1)
+        plt.plot(np.arange(Imax, Imin-1e-4, -Istep), Prior, 'b')
+        plt.plot(np.arange(Imax, Imin-1e-4, -Istep), convolve_relax[-N_state_total:], 'r')
+        plt.grid()
+    plt.show()
+    """
+
     #for row_start in np.arange(0, 128):
     #    MLC_IDSAT_algorithm_rv1(14, 33, 16, 2, 'ULVT', 1.8, 2.0, 128, [row_start], [71, 55, 46, 35], [0.002, 0.01, 0.04, 0.2], 4, [], '', ['../Data/chip14/MLC_programming_Chip14_Col33_2msPULSE_VG1p8_VD2p0_VAsource_VBdrain_01', '../Data/chip14/MLC_programming_Chip14_Col33_10msPULSE_VG1p8_VD2p0_VAsource_VBdrain_02', '../Data/chip14/MLC_programming_Chip14_Col33_40msPULSE_VG1p8_VD2p0_VAsource_VBdrain_03', '../Data/chip14/MLC_programming_Chip14_Col33_200msPULSE_VG1p8_VD2p0_VAsource_VBdrain_04'], '../Plots/chip14/', 'VG1p8_VD2p0', '_cycle01020304_row'+str(row_start).zfill(3), Imin=12, Imax=136)
 
-    MLC_IDSAT_algorithm_rv1(14, 33, 16, 2, 'ULVT', 1.8, 2.0, 128, range(0, 128), [71, 55, 46, 35], [0.002, 0.01, 0.04, 0.2], 4, [], '', ['../Data/chip14/MLC_programming_Chip14_Col33_2msPULSE_VG1p8_VD2p0_VAsource_VBdrain_01', '../Data/chip14/MLC_programming_Chip14_Col33_10msPULSE_VG1p8_VD2p0_VAsource_VBdrain_02', '../Data/chip14/MLC_programming_Chip14_Col33_40msPULSE_VG1p8_VD2p0_VAsource_VBdrain_03', '../Data/chip14/MLC_programming_Chip14_Col33_200msPULSE_VG1p8_VD2p0_VAsource_VBdrain_04'], '../Plots/chip14/', 'VG1p8_VD2p0', '_cycle01020304_all')
+    Marcov_Chain_MLE(14, 33, 16, 2, 'ULVT', 1.8, 2.0, 128, range(0, 128), [71, 55, 46, 35], [0.002, 0.01, 0.04, 0.2], 4, ['../Data/chip14/MLC_programming_Chip14_Col33_2msPULSE_VG1p8_VD2p0_VAsource_VBdrain_01', '../Data/chip14/MLC_programming_Chip14_Col33_10msPULSE_VG1p8_VD2p0_VAsource_VBdrain_02', '../Data/chip14/MLC_programming_Chip14_Col33_40msPULSE_VG1p8_VD2p0_VAsource_VBdrain_03', '../Data/chip14/MLC_programming_Chip14_Col33_200msPULSE_VG1p8_VD2p0_VAsource_VBdrain_04'], '../Plots/chip14/', 'VG1p8_VD2p0', '', 160.0, [90.0, 70.0, 50.0, 30.0], 0.0, 0.5)
+    plt.show()
+    #MLC_IDSAT_algorithm_rv1(14, 33, 16, 2, 'ULVT', 1.8, 2.0, 128, range(0, 128), [71, 55, 46, 35], [0.002, 0.01, 0.04, 0.2], 4, [], '', ['../Data/chip14/MLC_programming_Chip14_Col33_2msPULSE_VG1p8_VD2p0_VAsource_VBdrain_01', '../Data/chip14/MLC_programming_Chip14_Col33_10msPULSE_VG1p8_VD2p0_VAsource_VBdrain_02', '../Data/chip14/MLC_programming_Chip14_Col33_40msPULSE_VG1p8_VD2p0_VAsource_VBdrain_03', '../Data/chip14/MLC_programming_Chip14_Col33_200msPULSE_VG1p8_VD2p0_VAsource_VBdrain_04'], '../Plots/chip14/', 'VG1p8_VD2p0', '_cycle01020304_all')
 
     #IDS_VGS(14, 33, 16, 2, 'ULVT', 128, ['../Data/chip14/Fresh_Chip14_Col33_Ids_Vgs_VAsource_VBdrain', '../Data/chip14/MLC_Chip14_Col33_2msPULSE_VG1p8_VD2p0_Ids_Vgs_VAsource_VBdrain_01', '../Data/chip14/MLC_Chip14_Col33_10msPULSE_VG1p8_VD2p0_Ids_Vgs_VAsource_VBdrain_02', '../Data/chip14/MLC_Chip14_Col33_40msPULSE_VG1p8_VD2p0_Ids_Vgs_VAsource_VBdrain_03', '../Data/chip14/MLC_Chip14_Col33_200msPULSE_VG1p8_VD2p0_Ids_Vgs_VAsource_VBdrain_04'], ['b', 'y', 'r', 'k', 'g'], '../Plots/chip14/', 'Fresh_vs_MLC01020304_VG1p8_VD2p0_IDS-VGS_VaS-VbD_', range(0, 128), 'Fresh vs MLC-1-2-3-4 (VG=1.8, VD=2.0)\nMLC-{1, 2, 3, 4}: {2ms, 10ms, 40ms, 200ms} WL pulses, IDSAT threshold = {90, 70, 50, 30}uA, forward' , 150, ['fresh', 'MLC-01', 'MLC-02', 'MLC-03', 'MLC-04']) 
     #IDS_VGS(14, 33, 16, 2, 'ULVT', 128, ['../Data/chip14/Fresh_Chip14_Col33_Ids_Vgs_VAdrain_VBsource', '../Data/chip14/MLC_Chip14_Col33_2msPULSE_VG1p8_VD2p0_Ids_Vgs_VAdrain_VBsource_01', '../Data/chip14/MLC_Chip14_Col33_10msPULSE_VG1p8_VD2p0_Ids_Vgs_VAdrain_VBsource_02', '../Data/chip14/MLC_Chip14_Col33_40msPULSE_VG1p8_VD2p0_Ids_Vgs_VAdrain_VBsource_03', '../Data/chip14/MLC_Chip14_Col33_200msPULSE_VG1p8_VD2p0_Ids_Vgs_VAdrain_VBsource_04'], ['b', 'y', 'r', 'k', 'g'], '../Plots/chip14/', 'Fresh_vs_MLC01020304_VG1p8_VD2p0_IDS-VGS_VaD-VbS_', range(0, 128), 'Fresh vs MLC-1-2-3-4 (VG=1.8, VD=2.0)\nMLC-{1, 2, 3, 4}: {2ms, 10ms, 40ms, 200ms} WL pulses, IDSAT threshold = {90, 70, 50, 30}uA, reversed', 150, ['fresh', 'MLC-01', 'MLC-02', 'MLC-03', 'MLC-04']) 

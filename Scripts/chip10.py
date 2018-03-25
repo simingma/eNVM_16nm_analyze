@@ -12,7 +12,7 @@ from I_V_curves import IDS_VGS_stress, IDS_VGS, IDSAT_vs_row, hist_IDS_VGS
 from VG_ConstPulse_horizontal_hist import IDSAT_horizontal_hist
 from VG_ConstPulse_separation import IDSAT_separation
 from Charge_Pumping import Charge_Pumping, Charge_Pumping_compare
-from MLC_IDSAT import MLC_IDSAT_characterization, MLC_IDSAT_algorithm_naivete
+from MLC_IDSAT import multi_col_MLC_IDSAT_characterization, MLC_IDSAT_characterization, MLC_IDSAT_algorithm_naivete
 
 def main():
     
@@ -30,7 +30,7 @@ def main():
                 (16, 2, 'ULVT', 32 , 150), (16, 2, 'LVT', 32 , 125), (16, 2, 'SVT', 32 , 115),
                 (16, 2, 'ULVT', 128, 150), (16, 2, 'LVT', 128, 125), (16, 2, 'SVT', 128, 115)]
 
-    MLC_IDSAT_algorithm_naivete(10, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(0, 128), [16, 18, 15], [0.01, 0.04, 0.2], 3, [0, 0.16, 0.26, 0.98, 1.08, 4.08], ['0', '0.16', '0.16', '0.88', '0.88', '3.88'], ['../Data/chip10/MLC_programming_Chip10_Col21_10msPULSE_VG1p8_VD2p4_VAsource_VBdrain_01', '../Data/chip10/MLC_programming_Chip10_Col21_40msPULSE_VG1p8_VD2p4_VAsource_VBdrain_02', '../Data/chip10/MLC_programming_Chip10_Col21_200msPULSE_VG1p8_VD2p4_VAsource_VBdrain_03'], '../Plots/chip10/', 'VG1p8_VD2p4', '_Naivete_cycle010203')
+    #MLC_IDSAT_algorithm_naivete(10, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(0, 128), [16, 18, 15], [0.01, 0.04, 0.2], 3, [0, 0.16, 0.26, 0.98, 1.08, 4.08], ['0', '0.16', '0.16', '0.88', '0.88', '3.88'], ['../Data/chip10/MLC_programming_Chip10_Col21_10msPULSE_VG1p8_VD2p4_VAsource_VBdrain_01', '../Data/chip10/MLC_programming_Chip10_Col21_40msPULSE_VG1p8_VD2p4_VAsource_VBdrain_02', '../Data/chip10/MLC_programming_Chip10_Col21_200msPULSE_VG1p8_VD2p4_VAsource_VBdrain_03'], '../Plots/chip10/', 'VG1p8_VD2p4', '_Naivete_cycle010203')
 
     #t_label = []
     #for t in np.arange(0, 0.01*16 + 0.0001, 0.01):
@@ -54,6 +54,8 @@ def main():
     ##MLC_IDSAT_algorithm_naivete(10, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(0, 128), [15], [0.2], 1, np.arange(0, 0.2*15+0.0001, 0.2), t_label, ['../Data/chip10/MLC_programming_Chip10_Col21_200msPULSE_VG1p8_VD2p4_VAsource_VBdrain_03'], '../Plots/chip10/', 'VG1p8_VD2p4', '_Naivete_cycle03')
     #for row_start in np.arange(0, 128, 8):
     #    MLC_IDSAT_algorithm_naivete(10, 21, 36, 2, 'ULVT', 1.8, 2.4, 128, range(row_start, row_start+8), [15], [0.2], 1, np.arange(0, 0.2*15+0.0001, 0.2), t_label, ['../Data/chip10/MLC_programming_Chip10_Col21_200msPULSE_VG1p8_VD2p4_VAsource_VBdrain_03'], '../Plots/chip10/', 'VG1p8_VD2p4', '_Naivete_cycle03_row'+str(row_start)+'_to_'+str(row_start+7))
+
+    multi_col_MLC_IDSAT_characterization(10, [18, 18, 30, 30], [36, 36, 16, 16], 2, 'ULVT', 1.8, [2.0, 2.4, 1.7, 2.0], 32, [range(0, 16), range(16, 32), range(0, 16), range(16, 32)], [40, 20, 12], [0.01, 0.04, 0.2], 3, [], [], [['../Data/chip10/Chip10_Col18_HCI_40x10ms_stress_VG_ConstPulse_VAsource_VBdrain_01', '../Data/chip10/Chip10_Col18_HCI_20x40ms_stress_VG_ConstPulse_VAsource_VBdrain_02', '../Data/chip10/Chip10_Col18_HCI_12x200ms_stress_VG_ConstPulse_VAsource_VBdrain_03'], ['../Data/chip10/Chip10_Col18_HCI_40x10ms_stress_VG_ConstPulse_VAsource_VBdrain_01', '../Data/chip10/Chip10_Col18_HCI_20x40ms_stress_VG_ConstPulse_VAsource_VBdrain_02', '../Data/chip10/Chip10_Col18_HCI_12x200ms_stress_VG_ConstPulse_VAsource_VBdrain_03'],['../Data/chip10/Chip10_Col30_HCI_40x10ms_stress_VG_ConstPulse_VAsource_VBdrain_01', '../Data/chip10/Chip10_Col30_HCI_20x40ms_stress_VG_ConstPulse_VAsource_VBdrain_02', '../Data/chip10/Chip10_Col30_HCI_12x200ms_stress_VG_ConstPulse_VAsource_VBdrain_03'], ['../Data/chip10/Chip10_Col30_HCI_40x10ms_stress_VG_ConstPulse_VAsource_VBdrain_01', '../Data/chip10/Chip10_Col30_HCI_20x40ms_stress_VG_ConstPulse_VAsource_VBdrain_02', '../Data/chip10/Chip10_Col30_HCI_12x200ms_stress_VG_ConstPulse_VAsource_VBdrain_03']], [['lime', 'darkgreen', 'o'], ['red', 'darkred', '<'], ['deepskyblue', 'midnightblue', 'D'], ['magenta','darkviolet', '*']], '../Plots/chip10/', ['L=36nm, VDS=2.0V', 'L=36nm, VDS=2.4V', 'L=16nm, VDS=1.7V', 'L=16nm, VDS=2.0V'], '_cycle010203_vlsi')
 
     #MLC_IDSAT_characterization(10, 18, 36, 2, 'ULVT', 1.8, 2.0, 32, range(0, 16) , [40, 20, 12], [0.01, 0.04, 0.2], 3, [0, 0.4, 0.8, 1.6, 2.0, 2.6, 3.2, 3.8, 4.4], ['0', '0.4', '0.4', '1.2', '1.2', '1.8', '2.4', '3.0', '3.6'], ['../Data/chip10/Chip10_Col18_HCI_40x10ms_stress_VG_ConstPulse_VAsource_VBdrain_01', '../Data/chip10/Chip10_Col18_HCI_20x40ms_stress_VG_ConstPulse_VAsource_VBdrain_02', '../Data/chip10/Chip10_Col18_HCI_12x200ms_stress_VG_ConstPulse_VAsource_VBdrain_03'], '../Plots/chip10/', 'VG1p8_VD2p0', '_cycle010203', 38, 112, 1)
     #MLC_IDSAT_characterization(10, 18, 36, 2, 'ULVT', 1.8, 2.4, 32, range(16, 32), [40, 20, 12], [0.01, 0.04, 0.2], 3, [0, 0.4, 0.8, 1.6, 2.0, 2.6, 3.2, 3.8, 4.4], ['0', '0.4', '0.4', '1.2', '1.2', '1.8', '2.4', '3.0', '3.6'], ['../Data/chip10/Chip10_Col18_HCI_40x10ms_stress_VG_ConstPulse_VAsource_VBdrain_01', '../Data/chip10/Chip10_Col18_HCI_20x40ms_stress_VG_ConstPulse_VAsource_VBdrain_02', '../Data/chip10/Chip10_Col18_HCI_12x200ms_stress_VG_ConstPulse_VAsource_VBdrain_03'], '../Plots/chip10/', 'VG1p8_VD2p4', '_cycle010203', 16, 110, 1)

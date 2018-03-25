@@ -256,7 +256,7 @@ def Charge_Pumping_compare(chips, curve_legend, col, L, Nfin, VT_flavor, Nrow, d
     axe_norm_handle = []
     axe_raw_handle = []#add the raw current curves under 5MHz and 1kHz
                  
-    color_list = ['blue', 'k', 'm', 'red', 'yellow', 'lime', 'orange', 'darkviolet', 'olive', 'orchid', 'cyan', 'lightseagreen', 'crimson']
+    color_list = ['blue', 'red', 'm', 'k', 'yellow', 'lime', 'orange', 'darkviolet', 'olive', 'orchid', 'cyan', 'lightseagreen', 'crimson']
 
     for (curve_idx, data_file) in zip(range(len(data_files)), data_files):
         """
@@ -326,12 +326,15 @@ def Charge_Pumping_compare(chips, curve_legend, col, L, Nfin, VT_flavor, Nrow, d
     plt.ylabel('Icp = Isub_with_pumping-Isub_with_pumping @' + freq_DCcorrection +' (nA)')
     #plt.xlabel('Vbase (V)')
     #plt.ylabel('Icp (nA)')
-    plt.grid()
+    plt.xticks([-1.6, -1.2, -0.8, -0.4, 0], ['-1.6', '-1.2', '-0.8', '-0.4', '0'], fontsize=17)
+    plt.yticks([0, 2, 4, 6, 8, 10, 12], ['0', '2', '4', '6', '8', '10', '12'], fontsize=17)
+    #plt.grid()
     #plt.legend(axe_handle, curve_legend, fontsize = 12)
-    plt.legend(axe_handle, curve_legend, fontsize = 8)
+    plt.legend(axe_handle, curve_legend, fontsize = 16)
     plt.savefig(path_plot+plot_file+'_Col'+str(col).zfill(2)+'_Pumping_minus_DCcorrection.pdf')
     plt.close()
 
+    """
     plt.figure(2)
     plt.title(title+'L='+str(L)+', Nfin='+str(Nfin)+', '+VT_flavor+', '+'VSS_WL(Vbot)='+str(VSS_WL)+', VDD_WL='+str(VDD_WL)+', sweep VS=VB=VD(Vsbd), charge pumping curves DC corrected by '+freq_DCcorrection+', normalized by DC corrected Icp,max', fontsize=6)
     #plt.axis([VG_min, VG_max, 0, Ymax])
@@ -339,7 +342,7 @@ def Charge_Pumping_compare(chips, curve_legend, col, L, Nfin, VT_flavor, Nrow, d
     plt.xlabel('Vbot - Vsbd (V)')
     plt.ylabel('Icp/Icp,max')
     plt.grid()
-    plt.legend(axe_norm_handle, curve_legend, fontsize = 8)
+    plt.legend(axe_norm_handle, curve_legend, fontsize = 16)
     plt.savefig(path_plot+plot_file+'_Col'+str(col).zfill(2)+'_Pumping_minus_DCcorrection_normalized.pdf')
     plt.close()
 
@@ -352,9 +355,10 @@ def Charge_Pumping_compare(chips, curve_legend, col, L, Nfin, VT_flavor, Nrow, d
     plt.xlabel('Vbot - Vsbd (V)')
     plt.ylabel('Icp at 5MHz (dotted) and @' + freq_DCcorrection +'(line) (nA)')
     plt.grid()
-    plt.legend(axe_raw_handle, curve_legend, fontsize = 8)
+    plt.legend(axe_raw_handle, curve_legend, fontsize = 16)
     plt.savefig(path_plot+plot_file+'_Col'+str(col).zfill(2)+'_5MHz_1kHz_Icp_curves.pdf')
     plt.close()
+    """
 #Temporary! Check absolute Icp values at 5MHz and 1kHz, to see wether they change conspicuously after various experiments!
 
 if __name__ == '__main__':

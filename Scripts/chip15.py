@@ -19,18 +19,63 @@ import scipy.linalg as sp_lin
 
 def main():
     
-    Istep = 0.2
+    """
+    Istep = 0.5
     Imax = 160.0
-    Ith = 95.0
-    Imin = 90.0
+    Ith = np.array([95.0, 80.0, 65.0, 50.0, 35.0, 20.0, 5.0])
+    Tpulse = np.array([0.001, 0.003, 0.009, 0.027, 0.081, 0.243, 0.729])
+    Imin = 0.0
     #generator = death_birth_generator_matrix(1/14.0, 40000.0, 0.7, 350, Istep)
     #generator = death_birth_generator_matrix(1/14.0, 100000.0, 1.5, 350, Istep)
-    generator = death_birth_generator_matrix(1/12.0, 120000.0, 5.6, 350, Istep)
-    N_state_transient = 325
-    N_state_total = 350
-    Tpulse = 0.001
-    T_mat, P_mat = transition_matrix(generator, Tpulse, N_state_total, N_state_transient) 
+    #generator = death_birth_generator_matrix(1/12.0, 120000.0, 5.6, 350, Istep)
+    N_state_total = int(round((Imax - Imin)/Istep) + 1)
+    k_inv = 15.489
+    b0 = 21207.8
+    #d0 = 80000.0
+    #r = -1.5
+    #generator = death_birth_generator_matrix(1/k_inv, b0, d0, r, N_state_total, Istep)
 
+    #generator = Testing_death_birth_generator_matrix(1/k_inv, b0, 4000.0, 13.0, N_state_total, Istep)
+    generator = Testing_death_birth_generator_matrix(1/k_inv, b0, 6000.0, 14.0, N_state_total, Istep)
+
+    Prior = Gaussian_function(np.arange(N_state_total), IDSAT_to_state(144.685), 5.778678/Istep)
+    relaxation = Gaussian_function(np.arange(N_state_total), IDSAT_to_state(1.35, Imax=160.0, Istep=Istep), 0.95/Istep)
+    for cycle in np.arange(6):
+        N_state_transient = int(round((Imax - Ith[cycle])/Istep) + 1)
+        T_mat, P_mat = transition_matrix(generator, Tpulse[cycle], N_state_total, N_state_transient) 
+        Final_mat = np.linalg.matrix_power(P_mat, 1024)
+        Prior = np.matmul(Prior, Final_mat)
+        Prior_mean = 0
+        Prior_std = 0
+        for i in np.arange(N_state_total):
+            Prior_mean += (Imax - Istep*i) * Prior[i]
+        for i in np.arange(N_state_total):
+            Prior_std += (Imax - Istep*i - Prior_mean)**2 * Prior[i]
+        Prior_std = np.sqrt(Prior_std)
+        print('level ', cycle+1, 'mean and std')
+        print('before relax', Prior_mean, Prior_std)
+        convolve_relax = np.convolve(Prior, relaxation)
+        convolve_relax = convolve_relax[-N_state_total:]
+        #relax_mean = Imax - Istep * np.average(np.arange(N_state_total), weights = convolve_relax)
+        #print(relax_mean)
+        relax_mean = 0
+        relax_std = 0
+        for i in np.arange(N_state_total):
+            relax_mean += (Imax - Istep*i) * convolve_relax[i]
+        for i in np.arange(N_state_total):
+            relax_std += (Imax - Istep*i - relax_mean)**2 * convolve_relax[i]
+        relax_std = np.sqrt(relax_std)
+        print('after relax', relax_mean, relax_std)
+        #plt.figure(cycle+1)
+        plt.plot(np.arange(Imax, Imin-1e-4, -Istep), Prior, 'b')
+        plt.plot(np.arange(Imax, Imin-1e-4, -Istep), convolve_relax[-N_state_total:], 'r')
+        plt.grid()
+    """
+
+    Marcov_Chain_MLE(15, 33, 16, 2, 'ULVT', 1.8, 2.0, 128, range(0, 128), [227, 134, 93, 101, 65, 97], [0.001, 0.003, 0.009, 0.027, 0.081, 0.243], 6, ['../Data/chip15/MLC_programming_Chip15_Col33_1msPULSE_VG1p8_VD2p0_VAsource_VBdrain_01', '../Data/chip15/MLC_programming_Chip15_Col33_3msPULSE_VG1p8_VD2p0_VAsource_VBdrain_02', '../Data/chip15/MLC_programming_Chip15_Col33_9msPULSE_VG1p8_VD2p0_VAsource_VBdrain_03', '../Data/chip15/MLC_programming_Chip15_Col33_27msPULSE_VG1p8_VD2p0_VAsource_VBdrain_04', '../Data/chip15/MLC_programming_Chip15_Col33_81msPULSE_VG1p8_VD2p0_VAsource_VBdrain_05', '../Data/chip15/MLC_programming_Chip15_Col33_243msPULSE_VG1p8_VD2p0_VAsource_VBdrain_06'], '../Plots/chip15/', 'VG1p8_VD2p0', '', 160.0, [95.0, 80.0, 65.0, 50.0, 35.0, 20.0], 0.0, 0.5)
+    plt.show()
+
+    """
     #fig = plt.figure(1)
     #ax = fig.gca(projection='3d')
     #x = np.arange(350)
@@ -66,7 +111,6 @@ def main():
     #std_dev = np.std(Final_dis)
     #print(mean, std_dev)
     print(np.sum(Final_dis))
-
 
 
     #s_samp = np.zeros((len(np.arange(150.0, 90.0, -1.0))), dtype = np.int32)
@@ -123,6 +167,7 @@ def main():
     #for i in np.arange(324, 350):
     #    print('vl '+str(i)+': ', vl[i])
     #    print('vr '+str(i)+': ', vr[i])
+    """
 
     """
     p_b_tot = np.zeros((N_state_transient))
@@ -147,7 +192,9 @@ def main():
 
 
     #Marcov_Chain_MLE(15, 33, 16, 2, 'ULVT', 1.8, 2.0, 128, range(0, 128), [227], [0.001], 1, ['../Data/chip15/MLC_programming_Chip15_Col33_1msPULSE_VG1p8_VD2p0_VAsource_VBdrain_01'], '../Plots/chip15/', 'VG1p8_VD2p0', '', 160.0, 95.0, 90.0, 0.2)
-    Marcov_Chain_MLE(15, 33, 16, 2, 'ULVT', 1.8, 2.0, 128, range(0, 128), [227], [0.001], 1, ['../Data/chip15/MLC_programming_Chip15_Col33_1msPULSE_VG1p8_VD2p0_VAsource_VBdrain_01'], '../Plots/chip15/', 'VG1p8_VD2p0', '', 160.0, 95.0, 90.0, 1.0)
+    #Marcov_Chain_MLE(15, 33, 16, 2, 'ULVT', 1.8, 2.0, 128, range(0, 128), [227], [0.001], 1, ['../Data/chip15/MLC_programming_Chip15_Col33_1msPULSE_VG1p8_VD2p0_VAsource_VBdrain_01'], '../Plots/chip15/', 'VG1p8_VD2p0', '', 160.0, 95.0, 90.0, 1.0)
+    #Marcov_Chain_MLE(15, 33, 16, 2, 'ULVT', 1.8, 2.0, 128, range(0, 128), [227], [0.001], 1, ['../Data/chip15/MLC_programming_Chip15_Col33_1msPULSE_VG1p8_VD2p0_VAsource_VBdrain_01'], '../Plots/chip15/', 'VG1p8_VD2p0', '', 160.0, [95.0], 0.0, 0.5)
+    #Marcov_Chain_MLE(15, 33, 16, 2, 'ULVT', 1.8, 2.0, 128, range(0, 128), [227, 134, 93, 101, 65, 97, 277], [0.001, 0.003, 0.009, 0.027, 0.081, 0.243, 0.729], 7, ['../Data/chip15/MLC_programming_Chip15_Col33_1msPULSE_VG1p8_VD2p0_VAsource_VBdrain_01', '../Data/chip15/MLC_programming_Chip15_Col33_3msPULSE_VG1p8_VD2p0_VAsource_VBdrain_02', '../Data/chip15/MLC_programming_Chip15_Col33_9msPULSE_VG1p8_VD2p0_VAsource_VBdrain_03', '../Data/chip15/MLC_programming_Chip15_Col33_27msPULSE_VG1p8_VD2p0_VAsource_VBdrain_04', '../Data/chip15/MLC_programming_Chip15_Col33_81msPULSE_VG1p8_VD2p0_VAsource_VBdrain_05', '../Data/chip15/MLC_programming_Chip15_Col33_243msPULSE_VG1p8_VD2p0_VAsource_VBdrain_06', '../Data/chip15/MLC_programming_Chip15_Col33_729msPULSE_VG1p8_VD2p0_VAsource_VBdrain_07'], '../Plots/chip15/', 'VG1p8_VD2p0', '', 160.0, [95.0, 80.0, 65.0, 50.0, 35.0, 20.0, 5.0], 0.0, 0.5)
 
     #Marcov_Chain(15, 33, 16, 2, 'ULVT', 1.8, 2.0, 128, range(0, 128), [227], [0.001], 1, ['../Data/chip15/MLC_programming_Chip15_Col33_1msPULSE_VG1p8_VD2p0_VAsource_VBdrain_01'], '../Plots/chip15/', 'VG1p8_VD2p0', '', 160.0, 95.0, 90.0, 0.2)
 
