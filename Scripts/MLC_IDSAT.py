@@ -22,7 +22,7 @@ def power_shift(x, b, a, n):
     return b - a * x**n
 
 def multi_col_MLC_IDSAT_characterization(chip, col_col, L, Nfin, VT_flavor, VG, VD, Nrow, col_row_idx, 
-        write_time, pulse_length, PulseCycle,  
+        write_time_list, pulse_length_list, PulseCycle,  
         t, t_label,
         col_data_files, colors, path_plot, VGVD_char, title, Imin=0, Imax=0):
 
@@ -35,7 +35,7 @@ def multi_col_MLC_IDSAT_characterization(chip, col_col, L, Nfin, VT_flavor, VG, 
 
     #plt.figure(figsize=(12, 12))
     legend = []
-    for (col, row_idx, data_files, color) in zip(col_col, col_row_idx, col_data_files, colors):
+    for (pulse_length, write_time, col, row_idx, data_files, color) in zip(pulse_length_list, write_time_list, col_col, col_row_idx, col_data_files, colors):
         #for (meas_dir, direction) in [('reversed', 'VAdrain_VBsource'), ('forward', 'VAsource_VBdrain')]:
         for (meas_dir, direction) in [('reversed', 'VAdrain_VBsource')]:
             data_points = 0
@@ -87,30 +87,36 @@ def multi_col_MLC_IDSAT_characterization(chip, col_col, L, Nfin, VT_flavor, VG, 
                 data_points += 1+1+write_time[cycle]+1
             axe, = plt.plot(time_points, I_mean-I_mean[0], color = color[1], marker = color[2], markersize=9, alpha=1.0, linestyle = 'None')
             legend.append(axe)
+            """
             popt, pcov = curve_fit(log_shift_I0, time_points, I_mean-I_mean[0], bounds=(0, np.inf))
             plt.plot(time_points, log_shift_I0(time_points, *popt), linewidth=2.4, color=color[0])
             print(popt)
             print(1/popt[0], popt[0]*popt[1])
+            """
 
     #plt.xticks(t, t_label, rotation=30, fontsize=9)
     #plt.xticks(t, t_l=abel)
     #plt.ylim(0, 165)
-    plt.ylim(-100, 0)
+    plt.ylim(-105, 0)
     #plt.xlim(-pulse_length[0], t[-1]+0.1)
+    """
     plt.xticks([0.5, 1.5, 2.5, 3.5], ['0.5', '1.5', '2.5', '3.5'], fontsize=17)
     plt.yticks([-100, -80, -60, -40, -20, 0], ['-100', '-80', '-60', '-40', '-20', '0'], fontsize=17)
+    VGVD_char = ['$\mathrm{L=36nm, V_{DS}=2.0V}$', '$\mathrm{L=36nm, V_{DS}=2.4V}$', '$\mathrm{L=16nm, V_{DS}=1.7V}$', '$\mathrm{L=16nm, V_{DS}=2.0V}$']
+    """
     #plt.grid()
     #plt.legend([HCI_fig, PBTI_fig], ['HCI', 'PBTI: VDS=0'], loc = 'best')
     plt.xlabel('time (sec)', fontsize=17)
     plt.ylabel('IDSAT (uA)', fontsize=17)
-    VGVD_char = ['$\mathrm{L=36nm, V_{DS}=2.0V}$', '$\mathrm{L=36nm, V_{DS}=2.4V}$', '$\mathrm{L=16nm, V_{DS}=1.7V}$', '$\mathrm{L=16nm, V_{DS}=2.0V}$']
-    plt.legend(legend, VGVD_char, fontsize=17)
+    plt.legend(legend, VGVD_char, fontsize=12)
     #plt.subplots_adjust(bottom=0.15)
-    plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col-compare_'+'VGVD-compare_I-shift'+meas_dir+title+'_log-curve-fit.pdf')
-    #plt.xscale('log')
+    plt.grid()
+    plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col-compare_'+'VGVD-compare_I-shift_'+meas_dir+title+'.pdf')
+    #plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col-compare_'+'VGVD-compare_I-shift_'+meas_dir+title+'_log-curve-fit.pdf')
+    plt.xscale('log')
     #plt.show()
-    #plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col-compare_'+'VGVD-compare_I-shift'+meas_dir+title+'_logTime_log-curve-fit.pdf')
-    #plt.savefig(path_plot+'IDSAT_'+str(figN).zfill(3)+'_Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_'+meas_dir+'.pdf')
+    #plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col-compare_'+'VGVD-compare_I-shift_'+meas_dir+title+'_logTime_log-curve-fit.pdf')
+    plt.savefig(path_plot+'Chip'+str(chip).zfill(2)+'_Col-compare_'+'VGVD-compare_I-shift_'+meas_dir+title+'_logTime.pdf')
     plt.close()
 
 
@@ -169,7 +175,8 @@ def MLC_IDSAT_characterization(chip, col, L, Nfin, VT_flavor, VG, VD, Nrow, row_
         for cycle in np.arange(PulseCycle):
 
             for row in row_idx:
-                plt.plot(cycle*0.4+np.append(np.arange(Tstress_accum-pulse_length[cycle], Tstress_accum+write_time[cycle]*pulse_length[cycle]+0.0001, pulse_length[cycle]), np.array([Tstress_accum+write_time[cycle]*pulse_length[cycle]+0.1])), 1e6*IDSAT[row][data_points: data_points+(1+1+write_time[cycle]+1)], color='r', linestyle='solid', marker='.')
+                # A spacing of twice the last pulse_length (the longest one, e. pulse_length[-1] = 0.2s => a spacing of 0.4s ) between each cycle to leave room for plotting the pre-stress disturbance and post-stress relaxation
+                plt.plot(cycle*(pulse_length[-1]*2) + np.append(np.arange(Tstress_accum-pulse_length[cycle], Tstress_accum+write_time[cycle]*pulse_length[cycle]+0.000001, pulse_length[cycle]), np.array([Tstress_accum+write_time[cycle]*pulse_length[cycle]+0.5*pulse_length[-1]])), 1e6*IDSAT[row][data_points: data_points+(1+1+write_time[cycle]+1)], color='r', linestyle='solid', marker='.')
 
             Tstress_accum += write_time[cycle]*pulse_length[cycle]
             data_points += 1+1+write_time[cycle]+1
@@ -177,7 +184,7 @@ def MLC_IDSAT_characterization(chip, col, L, Nfin, VT_flavor, VG, VD, Nrow, row_
         #plt.xticks(t, t_label, rotation=30, fontsize=9)
         plt.xticks(t, t_label)
         plt.ylim(Imin, Imax)
-        plt.xlim(-pulse_length[0], t[-1]+0.1)
+        plt.xlim(-pulse_length[0], t[-1]+pulse_length[-1])
         plt.grid()
         #plt.legend([HCI_fig, PBTI_fig], ['HCI', 'PBTI: VDS=0'], loc = 'best')
         plt.xlabel('time (sec)')
@@ -224,7 +231,7 @@ def MLC_IDSAT_characterization(chip, col, L, Nfin, VT_flavor, VG, VD, Nrow, row_
         for cycle in np.arange(PulseCycle):
 
             for row in row_idx:
-                plt.plot(cycle*0.4+np.arange(Tstress_accum+pulse_length[cycle], Tstress_accum+write_time[cycle]*pulse_length[cycle]+0.0001, pulse_length[cycle]), 1e6*ID_prog[row][data_points: data_points+write_time[cycle]], color='r', linestyle='solid', marker='.')
+                plt.plot(cycle*(pulse_length[-1]*2)+np.arange(Tstress_accum+pulse_length[cycle], Tstress_accum+write_time[cycle]*pulse_length[cycle]+0.0001, pulse_length[cycle]), 1e6*ID_prog[row][data_points: data_points+write_time[cycle]], color='r', linestyle='solid', marker='.')
 
             Tstress_accum += write_time[cycle]*pulse_length[cycle]
             data_points += write_time[cycle]
@@ -276,7 +283,7 @@ def MLC_IDSAT_characterization(chip, col, L, Nfin, VT_flavor, VG, VD, Nrow, row_
         for cycle in np.arange(PulseCycle):
 
             for row in row_idx:
-                plt.plot(cycle*0.4+np.arange(Tstress_accum+pulse_length[cycle], Tstress_accum+write_time[cycle]*pulse_length[cycle]+0.0001, pulse_length[cycle]), 1e6*Isub[row][data_points: data_points+write_time[cycle]], color='g', linestyle='solid', marker='.')
+                plt.plot(cycle*(pulse_length[-1]*2)+np.arange(Tstress_accum+pulse_length[cycle], Tstress_accum+write_time[cycle]*pulse_length[cycle]+0.0001, pulse_length[cycle]), 1e6*Isub[row][data_points: data_points+write_time[cycle]], color='g', linestyle='solid', marker='.')
 
             Tstress_accum += write_time[cycle]*pulse_length[cycle]
             data_points += write_time[cycle]

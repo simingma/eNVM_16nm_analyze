@@ -180,13 +180,13 @@ def hist_IDS_VGS(VG_idx, chip, col, L, Nfin, VT_flavor, Nrow, data_files, colors
         if np.amax(n) > n_max:
             n_max = np.amax(n)
     print(n_max)
-    ax_h.set_xlim(0, 14)
+    #ax_h.set_xlim(0, 22)
     #ax_h.set_xlim(0, n_max*4)
     ax_h.set_ylim(Ymin, Ymax)
     #ax_h.grid(True)
     plt.yticks([],[])
     ax_h.set_aspect(aspect = 0.3)
-    plt.xticks([4, 8, 12], ['4', '8', '12'], fontsize=17)
+    plt.xticks([5, 10, 15, 20], ['5', '10', '15', '20'], fontsize=22)
     #plt.xlabel('number of cells')
     #plt.title('L='+str(L)+', Nfin='+str(Nfin)+', '+VT_flavor+', #'+str(Nrow)+'cells\n'+title, fontsize=7)
     plt.savefig(path_plot+plot_file+'Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_horizontal.pdf')
@@ -263,15 +263,18 @@ def IDS_VGS(chip, col, L, Nfin, VT_flavor, Nrow, data_files, colors, path_plot, 
             fig, = plt.plot(VDD_WL, 1e6*IDS_VGS[row], color=color, linestyle='solid', marker='.', alpha = 0.4)
         IV_group.append(fig)
 
-    plt.title('L='+str(L)+', Nfin='+str(Nfin)+', '+VT_flavor+', '+title+' IDS-VGS curves', fontsize=7)
+    #plt.title('L='+str(L)+', Nfin='+str(Nfin)+', '+VT_flavor+', '+title+' IDS-VGS curves', fontsize=7)
     if (len(IV_group_legend) != 0):
         plt.legend(IV_group, IV_group_legend, loc = 'best')
     plt.axis([VG_min, VG_max, 0, Ymax])
-    plt.xlabel('VGS (V)')
-    plt.ylabel('IDS (uA)')
-    plt.xticks([0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8], ['0.2', '0.3', '0.4', '0.5', '0.6', '0.7', '0.8'], fontsize=17)
+    plt.xlabel('$\mathregular{V_{GS}}$ (V)', fontsize = 23)
+    plt.ylabel('$\mathregular{I_{DS}}$ ($\mathregular{\mu}$A)', fontsize = 23)
+    #plt.grid()
+    #plt.xlabel('VGS (V)')
+    #plt.ylabel('IDS (uA)')
+    plt.xticks([0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8], ['0.2', '0.3', '0.4', '0.5', '0.6', '0.7', '0.8'], fontsize=22)
     #plt.yticks([20, 40, 60, 80, 100], ['20', '40', '60', '80', '100'], fontsize=17)
-    plt.yticks([20, 40, 60, 80, 100, 120, 140, 160], ['20', '40', '60', '80', '100', '120', '140', '160'], fontsize=17)
+    plt.yticks([20, 40, 60, 80, 100, 120, 140, 160], ['20', '40', '60', '80', '100', '120', '140', '160'], fontsize=22)
     #plt.grid()
     ##plt.draw()
     ##xticks = []
@@ -288,6 +291,7 @@ def IDS_VGS(chip, col, L, Nfin, VT_flavor, Nrow, data_files, colors, path_plot, 
     ##    yticks.append(ylabel.get_text())
     ##plt.yticks(ylocs, yticks, fontsize=17)
 
+    plt.show()
     plt.savefig(path_plot+plot_file+'Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'.pdf', dpi=300)
     #plt.savefig(path_plot+'IDS_VGS_'+str(figN).zfill(2)+'_Chip'+str(chip).zfill(2)+'_Col'+str(col).zfill(2)+'_'+direction+'.pdf')
     #figN = figN + 1
